@@ -19,5 +19,5 @@ repos:
       name: Unit tests
       description: Runs unit tests
       language: system
-      entry: python3 -m unittest tests
+      entry: python3 -m unittest discover tests
       pass_filenames: false
