@@ -1,5 +1,3 @@
-from pathlib import Path
-
 # Static values
 VERSION = 0.1
 API_URL = "http://api.spiget.org/v2"
