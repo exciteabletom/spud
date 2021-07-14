@@ -1,5 +1,5 @@
 import unittest
-from spugin import api
+from spud import api
 
 
 class TestAPI(unittest.TestCase):

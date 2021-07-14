@@ -1,4 +1,4 @@
 # Static values
-VERSION = "0.1.1"
+VERSION = "0.1.2"
 API_URL = "http://api.spiget.org/v2"
-USER_AGENT = f"Spugin/{VERSION}"
+USER_AGENT = f"Spud/{VERSION}"

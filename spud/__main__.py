@@ -7,7 +7,9 @@ from .utils import Utils
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Manage Spigot server plugins")
+    parser = argparse.ArgumentParser(
+        description="Spud: The plugin manager for your Spigot Minecraft server"
+    )
     parser.add_argument("action", help="install, update, or remove", type=str)
     parser.add_argument("plugin_name", help="the name of the plugin", type=str)
     parser.add_argument(
