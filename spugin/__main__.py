@@ -22,6 +22,26 @@ def parse_args():
     return args
 
 
+def get_plugin_choice(plugin_list: list) -> dict:
+    Utils.status("--------------------")
+    for index, plugin in enumerate(plugin_list):
+        Utils.status(f"{index} | {plugin.get('name')} | {plugin.get('tag')}")
+
+    Utils.status("--------------------")
+
+    chosen_ID: int = 0
+    while True:
+        try:
+            chosen_ID = int(Utils.prompt("Select a plugin ID"))
+        except ValueError:
+            continue
+
+        if 0 <= chosen_ID < len(plugin_list):
+            return plugin_list[chosen_ID]
+        else:
+            continue
+
+
 def main():
     args = parse_args()
     args.plugin_name = Utils.sanitise_input(args.plugin_name)
@@ -29,8 +49,12 @@ def main():
 
     spiget_api = api.SpigetAPI()
     if args.action == "install":
-        Utils.status(f"Installing {args.plugin_name}")
-        result: dict = spiget_api.download_plugin(args.plugin_name)
+        plugin_list = spiget_api.search_plugins(args.plugin_name)
+        plugin = get_plugin_choice(plugin_list)
+
+        Utils.status(f"Installing {plugin.get('name')}")
+
+        result: dict = spiget_api.download_plugin(plugin)
 
         if result.get("status"):
             Utils.status(f"{args.plugin_name} was installed successfully")

@@ -1,4 +1,5 @@
 import string
+import sys
 from colorama import init as init_colorama
 from colorama import Fore
 
@@ -8,7 +9,6 @@ class Utils:
 
     @staticmethod
     def create_jar_name(text: str) -> str:
-        text = text.title()
         return text.translate(str.maketrans("", "", string.whitespace))
 
     @staticmethod
@@ -23,12 +23,18 @@ class Utils:
         print(Fore.GREEN + text)
 
     @staticmethod
-    def error(text):
+    def error(text, do_exit=True):
         print(Fore.RED + text)
+        if do_exit:
+            sys.exit(1)
 
     @staticmethod
     def warning(text):
         print(Fore.YELLOW + text)
+
+    @staticmethod
+    def prompt(text):
+        return input(Fore.CYAN + text + ": ")
 
     @staticmethod
     def status_dict(status: bool, error_message: str = ""):
