@@ -7,7 +7,7 @@ Work in progress, currently only the install action is implemented.
 
 
 ## Installation
-Install with `pip install spud`
+Install with `pip install spud-mc`
 
 Run `spud -h` to see all the options.
 
