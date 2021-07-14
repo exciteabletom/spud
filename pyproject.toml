@@ -5,5 +5,4 @@ requires = [
     "requests",
     "colorama",
     "pyyaml",
-    "appdirs",
 ]
