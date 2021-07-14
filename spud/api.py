@@ -74,7 +74,7 @@ class SpigetAPI:
         )
 
         safe_plugin_name = Utils.create_jar_name(plugin.get("name"))
-        with open(Path(f"./{safe_plugin_name}.jar").__str__(), "wb") as f:
+        with open(Path(f"{safe_plugin_name}.jar").__str__(), "wb") as f:
             f.write(response.content)
             pass
 

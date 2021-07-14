@@ -5,13 +5,14 @@ from spud import api
 class TestAPI(unittest.TestCase):
     spiget = api.SpigetAPI()
 
-    def test_get_plugin_id(self):
-        res = self.spiget.get_plugin_id("EssentialsX")
-        self.assertTrue(type(res) == int)
+    def test_search_plugins(self):
+        res = self.spiget.search_plugins("EssentialsX")
+        self.assertTrue(type(res) == list and type(res[0]) == dict)
 
     def test_download_plugin(self):
-        result = self.spiget.download_plugin("Better Giants")
-        self.assertTrue(result)
+        plugin = self.spiget.search_plugins("EssentialsX")[0]
+        result = self.spiget.download_plugin(plugin)
+        self.assertTrue(result.get("status"))
 
 
 if __name__ == "__main__":

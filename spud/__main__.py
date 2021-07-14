@@ -17,7 +17,7 @@ def parse_args():
         "--directory",
         dest="directory",
         help="path to plugins directory, defaults to `.`",
-        type=str,
+        type=Path,
         default=".",
     )
     args = parser.parse_args()
@@ -47,7 +47,7 @@ def get_plugin_choice(plugin_list: list) -> dict:
 def main():
     args = parse_args()
     args.plugin_name = Utils.sanitise_input(args.plugin_name)
-    os.chdir(Path(args.directory))
+    os.chdir(args.directory)
 
     spiget_api = api.SpigetAPI()
     if args.action == "install":
@@ -59,7 +59,7 @@ def main():
         result: dict = spiget_api.download_plugin(plugin)
 
         if result.get("status"):
-            Utils.status(f"{args.plugin_name} was installed successfully")
+            Utils.status(f"{plugin.get('name')} was installed successfully")
         else:
             Utils.error(result.get("error_message"))
 
