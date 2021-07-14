@@ -11,4 +11,4 @@ Install with `pip install spud`
 
 Run `spud -h` to see all the options.
 
-Inspired by `https://github.com/Neocky/pluGET`
+Inspired by [pluGET](https://github.com/Neocky/pluGET)
