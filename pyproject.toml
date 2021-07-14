@@ -3,4 +3,7 @@ requires = [
     "setuptools",
     "wheel",
     "requests",
+    "colorama",
+    "pyyaml",
+    "appdirs",
 ]
