@@ -11,4 +11,4 @@ Install with `pip install spugin`
 
 Run `spugin -h` to see all the options.
 
-Inspired by `https://github.com/Neocky/pluGET`
+Inspired by [pluGET](https://github.com/Neocky/pluGET)
