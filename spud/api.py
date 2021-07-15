@@ -31,29 +31,27 @@ class SpigetAPI:
         return response.json()
 
     def search_plugins(self, plugin_name: str) -> list:
-        split_name = Utils.split_title_case(plugin_name)
-        response_tag = self.call_api(
-            f"/search/resources/{split_name}",
-            {
-                "field": "tag",
-                "sort": "-downloads",
-                "size": 10,
-            },
-        )
-        response_name = self.call_api(
-            f"/search/resources/{plugin_name}",
-            {
-                "field": "name",
-                "sort": "-downloads",
-                "size": 10,
-            },
-        )
+        names = [plugin_name]
+        split_name: str = Utils.split_title_case(plugin_name)
+        names += split_name.split(" ")
+        fields = ("tag", "name")
 
-        if response_name.status_code == 404:
+        plugin_list = []
+        for name in names:
+            for field in fields:
+                response = self.call_api(
+                    f"/search/resources/{name}",
+                    {
+                        "field": field,
+                        "sort": "-downloads",
+                        "size": 10,
+                    },
+                )
+                if response.status_code == 200:
+                    plugin_list += response.json()
+
+        if not len(plugin_list):
             return Utils.error(f"No plugin with name {plugin_name} found.")
-
-        # Merge tag search and title searches together
-        plugin_list: list = response_tag.json() + response_name.json()
 
         # Sort the list by highest download, then IDs
         plugin_list.sort(key=operator.itemgetter("downloads", "id"), reverse=True)
@@ -61,7 +59,7 @@ class SpigetAPI:
         # remove duplicate ids from list
         plugin_list = [id_field[0] for id_field in itertools.groupby(plugin_list)]
 
-        return plugin_list[:5]
+        return plugin_list[:6]
 
     def download_plugin(self, plugin: dict, filename: str = "") -> dict:
         """
