@@ -23,6 +23,12 @@ class Utils:
         return text.translate(str.maketrans("", "", string.whitespace)) + ".jar"
 
     @staticmethod
+    def get_plugin_name_from_jar(jar_name: str) -> str:
+        if jar_name.endswith(".jar"):
+            return jar_name.replace(".jar", "")
+        return jar_name
+
+    @staticmethod
     def status(text):
         print(Fore.GREEN + text + Fore.RESET)
 

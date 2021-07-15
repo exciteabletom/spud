@@ -55,6 +55,8 @@ def main():
     spiget_api = api.SpigetAPI()
     if args.action == "install":
         for plugin_name in args.plugins:
+            plugin_name = Utils.get_plugin_name_from_jar(plugin_name)
+
             plugin_list = spiget_api.search_plugins(plugin_name)
             plugin = get_plugin_choice(plugin_list)
 
