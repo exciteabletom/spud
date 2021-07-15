@@ -11,7 +11,13 @@ def parse_args():
         description="Spud: The plugin manager for your Spigot Minecraft server"
     )
     parser.add_argument("action", help="install or update", type=str)
-    parser.add_argument("plugin_name", help="the name of the plugin", type=str)
+    parser.add_argument(
+        "plugins",
+        metavar="name",
+        help="the names (or filenames) of plugins",
+        type=str,
+        nargs="?",
+    )
     parser.add_argument(
         "-d",
         "--directory",
@@ -28,13 +34,11 @@ def get_plugin_choice(plugin_list: list) -> dict:
     Utils.status("--------------------")
     for index, plugin in enumerate(plugin_list):
         Utils.status(f"{index} | {plugin.get('name')} | {plugin.get('tag')}")
-
     Utils.status("--------------------")
 
-    chosen_ID: int = 0
     while True:
         try:
-            chosen_ID = int(Utils.prompt("Select a plugin ID"))
+            chosen_ID: int = int(Utils.prompt("Select a plugin ID"))
         except ValueError:
             continue
 
@@ -46,25 +50,41 @@ def get_plugin_choice(plugin_list: list) -> dict:
 
 def main():
     args = parse_args()
-    args.plugin_name = Utils.sanitise_input(args.plugin_name)
     os.chdir(args.directory)
 
     spiget_api = api.SpigetAPI()
     if args.action == "install":
-        plugin_list = spiget_api.search_plugins(args.plugin_name)
-        plugin = get_plugin_choice(plugin_list)
+        for plugin_name in args.plugins:
+            plugin_list = spiget_api.search_plugins(plugin_name)
+            plugin = get_plugin_choice(plugin_list)
 
-        Utils.status(f"Installing {plugin.get('name')}")
+            Utils.status(f"Installing {plugin.get('name')}")
 
-        result: dict = spiget_api.download_plugin(plugin)
+            result: dict = spiget_api.download_plugin(plugin)
 
-        if result.get("status"):
-            Utils.status(f"{plugin.get('name')} was installed successfully")
-        else:
-            Utils.error(result.get("error_message"))
+            if result.get("status"):
+                Utils.status(f"{plugin.get('name')} was installed successfully")
+            else:
+                Utils.warning(result.get("message"))
 
     elif args.action == "update":
-        Utils.error("Not implemented!")
+        if not args.plugins:
+            args.plugins = os.listdir()
+            plugins = [i for i in args.plugins if i.endswith(".jar")]
+        else:
+            plugins = args.plugins
+
+        for plugin_name in plugins:
+            filename = plugin_name
+            if ".jar" not in filename:
+                filename = Utils.create_jar_name(plugin_name)
+
+            result = spiget_api.download_plugin_if_update(filename)
+
+            if result.get("status"):
+                Utils.status(result.get("message"))
+            else:
+                Utils.warning(result.get("message"))
 
     else:
         Utils.error(f"Action {args.action} does not exist")
