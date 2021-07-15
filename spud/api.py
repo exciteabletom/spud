@@ -69,7 +69,12 @@ class SpigetAPI:
             else:
                 sorted_list.append(plugin)
 
-        return sorted_list[:10]
+        truncated_list = sorted_list[:10]
+
+        for plugin in truncated_list:
+            Utils.sanitise_api_plugin(plugin)
+
+        return truncated_list
 
     def download_plugin(self, plugin: dict, filename: str = "") -> dict:
         """

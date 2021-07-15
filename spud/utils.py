@@ -6,6 +6,7 @@ import zipfile
 
 from colorama import init as init_colorama
 from colorama import Fore
+import emoji
 
 from . import settings
 
@@ -17,6 +18,45 @@ class Utils:
     def sanitise_input(text: str) -> str:
         # TODO
         return text
+
+    @staticmethod
+    def sanitise_api_plugin(plugin: dict) -> dict:
+        """
+        This method tries it's best to remove garbage from plugin names and tags.
+
+        Example:
+        "1.17 | Plugin Name - The Greatest Plugin in the universe!!!! 😂😂😂😂😂!!!! I lack humility!"
+
+        becomes: "Plugin Name"
+
+        :return: Plugin dict with name and tag value sanitised from BS
+        """
+        safe_chars = string.ascii_letters
+
+        # Split plugin name by common separators
+        split_name = re.split("[-|/!\[\]<>()]", plugin.get("name"))
+        name = ""
+        # If a split doesn't contain any safe characters we can assume it is fluff
+        # this should remove segments like (1.13-1.17) at the beginning of names
+        for split in split_name:
+            for char in split:
+                if char in safe_chars:
+                    name += split + "|"
+                    break
+
+        for index, char in enumerate(name):
+            if char in "|(":
+                name = name[:index]
+
+        # Remove all emojis from name
+        name = emoji.get_emoji_regexp().sub("", name)
+
+        # Remove leading and trailing whitespace
+        plugin["name"] = name.strip()
+
+        plugin["tag"] = plugin.get("tag").replace("|", "-")
+
+        return plugin
 
     @staticmethod
     def create_jar_name(text: str) -> str:
@@ -77,7 +117,7 @@ class Utils:
             with zipfile.ZipFile(filename, "a") as jar:
                 jar.writestr(settings.METADATA_FILENAME, metadata)
         except:
-            Utils.error("Could not write metadata file")
+            Utils.error("Could not write metadata file due to an unknown error!")
 
     # noinspection PyBroadException
     @staticmethod
