@@ -2,9 +2,7 @@
 A cross-platform, [Spigot](https://www.spigotmc.org/) plugin manager that adheres to
 [Unix philosophy](https://en.wikipedia.org/wiki/Unix_philosophy) and conventions.
 
-
-Work in progress, currently only the install action is implemented.
-
+Work in progress.
 
 ## Installation
 Install with `pip install spud-mc`
