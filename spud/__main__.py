@@ -16,7 +16,7 @@ def parse_args():
         metavar="name",
         help="the names (or filenames) of plugins",
         type=str,
-        nargs="?",
+        nargs="*",
     )
     parser.add_argument(
         "-d",
