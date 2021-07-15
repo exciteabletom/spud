@@ -73,6 +73,9 @@ class SpigetAPI:
 
         for plugin in truncated_list:
             Utils.sanitise_api_plugin(plugin)
+            plugin["author"]["name"] = self.get_author(
+                plugin.get("author").get("id")
+            ).get("name")
 
         return truncated_list
 

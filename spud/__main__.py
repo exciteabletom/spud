@@ -37,11 +37,8 @@ class Main:
     def get_plugin_choice(self, plugin_list: list) -> dict:
         Utils.separator()
         for index, plugin in enumerate(plugin_list):
-            author = self.spiget_api.get_author(plugin.get("author").get("id")).get(
-                "name"
-            )
             Utils.status(
-                f"{index} | {plugin.get('name')} by {author} | {plugin.get('tag')}"
+                f"{index} | {plugin.get('name')} by {plugin.get('author').get('name')} | {plugin.get('tag')}"
             )
 
         Utils.separator()
