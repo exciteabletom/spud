@@ -59,7 +59,7 @@ class SpigetAPI:
         # remove duplicate ids from list
         plugin_list = [id_field[0] for id_field in itertools.groupby(plugin_list)]
 
-        return plugin_list[:6]
+        return plugin_list[:20]
 
     def download_plugin(self, plugin: dict, filename: str = "") -> dict:
         """

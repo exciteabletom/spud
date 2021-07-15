@@ -31,7 +31,7 @@ def parse_args():
 
 
 def get_plugin_choice(plugin_list: list) -> dict:
-    Utils.status("--------------------")
+    Utils.separator()
     for index, plugin in enumerate(plugin_list):
         Utils.status(f"{index} | {plugin.get('name')} | {plugin.get('tag')}")
     Utils.status("--------------------")

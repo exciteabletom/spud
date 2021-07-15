@@ -30,25 +30,30 @@ class Utils:
         return jar_name
 
     @staticmethod
-    def status(text):
+    def status(text) -> None:
         print(Fore.GREEN + text + Fore.RESET)
 
     @staticmethod
-    def error(text, do_exit=True):
+    def error(text, do_exit=True) -> None:
         print(Fore.RED + text + Fore.RESET)
         if do_exit:
             sys.exit(1)
 
     @staticmethod
-    def warning(text):
+    def warning(text) -> None:
         print(Fore.YELLOW + text + Fore.RESET)
 
     @staticmethod
-    def prompt(text):
+    def prompt(text) -> str:
         return input(Fore.CYAN + text + ": " + Fore.RESET)
 
     @staticmethod
-    def status_dict(status: bool, message: str = ""):
+    def separator() -> None:
+        sep_char = "-"
+        print(Fore.WHITE + (sep_char * 15) + Fore.RESET)
+
+    @staticmethod
+    def status_dict(status: bool, message: str = "") -> dict:
         return {
             "status": status,
             "message": message,
