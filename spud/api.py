@@ -129,3 +129,6 @@ class SpigetAPI:
             return Utils.status_dict(
                 True, f"Updated {plugin.get('name')} to latest version"
             )
+
+    def get_author(self, author_id: int) -> dict:
+        return self.call_api(f"/authors/{author_id}").json()
