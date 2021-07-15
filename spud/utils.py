@@ -45,7 +45,10 @@ class Utils:
 
     @staticmethod
     def prompt(text) -> str:
-        return input(Fore.CYAN + text + ": " + Fore.RESET)
+        try:
+            return input(Fore.CYAN + text + ": " + Fore.RESET)
+        except (KeyboardInterrupt, EOFError):
+            sys.exit(1)
 
     @staticmethod
     def separator() -> None:
@@ -64,7 +67,7 @@ class Utils:
     def inject_metadata_file(plugin: dict, filename: str) -> None:
         try:
             metadata = {
-                "plugin_name": plugin.get("name"),
+                "search_name": plugin.get("name"),
                 "plugin_id": plugin.get("id"),
                 "plugin_version_id": plugin.get("version").get("id"),
             }

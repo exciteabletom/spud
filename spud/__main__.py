@@ -34,14 +34,17 @@ def get_plugin_choice(plugin_list: list) -> dict:
     Utils.separator()
     for index, plugin in enumerate(plugin_list):
         Utils.status(f"{index} | {plugin.get('name')} | {plugin.get('tag')}")
-    Utils.status("--------------------")
+
+    Utils.separator()
 
     while True:
         try:
-            chosen_ID: int = int(Utils.prompt("Select a plugin ID"))
+            chosen_ID: int = int(Utils.prompt("Select a plugin ID (-1 to skip)"))
         except ValueError:
             continue
 
+        if chosen_ID == -1:
+            return {}
         if 0 <= chosen_ID < len(plugin_list):
             return plugin_list[chosen_ID]
         else:
@@ -58,7 +61,13 @@ def main():
             plugin_name = Utils.get_plugin_name_from_jar(plugin_name)
 
             plugin_list = spiget_api.search_plugins(plugin_name)
+
+            Utils.warning(f"Query: {plugin_name}")
             plugin = get_plugin_choice(plugin_list)
+
+            if not plugin:
+                Utils.warning("Skipping!")
+                continue
 
             Utils.status(f"Installing {plugin.get('name')}")
 
