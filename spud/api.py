@@ -31,8 +31,9 @@ class SpigetAPI:
         return response.json()
 
     def search_plugins(self, plugin_name: str) -> list:
+        split_name = Utils.split_title_case(plugin_name)
         response_tag = self.call_api(
-            f"/search/resources/{plugin_name}",
+            f"/search/resources/{split_name}",
             {
                 "field": "tag",
                 "sort": "-downloads",

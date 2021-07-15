@@ -1,3 +1,4 @@
+import re
 import json
 import string
 import sys
@@ -83,3 +84,7 @@ class Utils:
             return {}
         except:
             Utils.error(f"Could not read metadata file due to unknown error.")
+
+    @staticmethod
+    def split_title_case(text: str) -> str:
+        return " ".join(re.findall(r"[A-Z](?:[a-z]+|[A-Z]*(?=[A-Z]|$))", text))
