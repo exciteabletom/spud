@@ -1,12 +1,12 @@
-import re
 import json
+import re
 import string
 import sys
 import zipfile
 
-from colorama import init as init_colorama
-from colorama import Fore
 import emoji
+from colorama import Fore
+from colorama import init as init_colorama
 
 from . import settings
 
