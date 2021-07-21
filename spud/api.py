@@ -8,13 +8,18 @@ from .utils import Utils, StatusDict
 
 
 class SpigetAPI:
-    headers: dict = {
-        "user-agent": settings.USER_AGENT,
-    }
+    def __init__(
+        self,
+        base_api_url=settings.BASE_API_URL,
+    ):
+        self.headers: dict = {
+            "user-agent": settings.USER_AGENT,
+        }
 
-    @staticmethod
-    def build_api_url(api_request: str) -> str:
-        return f"{settings.API_URL}{api_request}"
+        self.base_api_url = base_api_url
+
+    def build_api_url(self, api_request: str) -> str:
+        return f"{self.base_api_url}{api_request}"
 
     # noinspection PyDefaultArgument
     def call_api(self, api_request: str, params: dict = {}) -> requests.Response:
