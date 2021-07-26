@@ -1,14 +1,29 @@
-import re
 import json
+import re
 import string
 import sys
 import zipfile
 
-from colorama import init as init_colorama
-from colorama import Fore
 import emoji
+from colorama import Fore
+from colorama import init as init_colorama
 
 from . import settings
+
+
+class StatusDict(dict):
+    """
+    A dict of form:
+        {
+            Status: bool,
+            message: str
+        }
+    """
+
+    def __init__(self, status, message=""):
+        super().__init__()
+        self["status"] = status
+        self["message"] = message
 
 
 class Utils:
@@ -94,13 +109,6 @@ class Utils:
     def separator() -> None:
         sep_char = "-"
         print(Fore.WHITE + (sep_char * 15) + Fore.RESET)
-
-    @staticmethod
-    def status_dict(status: bool, message: str = "") -> dict:
-        return {
-            "status": status,
-            "message": message,
-        }
 
     # noinspection PyBroadException
     @staticmethod

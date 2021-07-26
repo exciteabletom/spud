@@ -1,7 +1,7 @@
 import argparse
 import os
-
 from pathlib import Path
+
 from . import api
 from .utils import Utils
 
