@@ -15,7 +15,7 @@ class StatusDict(dict):
     """
     A dict of form:
         {
-            Status: bool,
+            status: bool,
             message: str
         }
     """
