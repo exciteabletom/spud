@@ -27,7 +27,7 @@ class Main:
             "-d",
             "--directory",
             dest="directory",
-            help="path to plugins directory, defaults to `.`",
+            help="path to plugins directory, defaults to the working directory",
             type=Path,
             default=".",
         )
