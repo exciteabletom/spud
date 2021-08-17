@@ -9,7 +9,6 @@ Install with `pip install spud-mc`
 
 Run `spud -h` to see all the options.
 
-Inspired by [pluGET](https://github.com/Neocky/pluGET)
 
 ## Example usages
 - Install a plugin: `spud install PluginName`
@@ -29,3 +28,10 @@ metadata file to the jar.
 
 
 - Spud can't install external resources or resources not listed on spigotmc.org
+
+
+
+
+## Acknowledgements
+Inspired by [pluGET](https://github.com/Neocky/pluGET)
+
