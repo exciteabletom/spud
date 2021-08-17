@@ -19,18 +19,13 @@ Run `spud -h` to see all the options.
 ## Known Issues
 - Some resources have lots of filler in the title. e.g. `[1.8-1.17] · PluginName |
 😃 😃 😃 | Epic Gaming Moments`.
-Spud tries it's best to extract the plugin name from titles like this but it will fail if there is copious amounts of
-garbage in the title
+Spud tries it's best to extract the plugin name, but it will fail if there is copious amounts of garbage in the title
 
 
-- Spud can't update plugins it hasn't installed. Make sure to install the plugin with Spud first so it can save a
-metadata file to the jar.
+- Spud can't update plugins it hasn't installed. Make sure to install the plugin with Spud first so it can save a metadata file to the jar.
 
 
 - Spud can't install external resources or resources not listed on spigotmc.org
-
-
-
 
 ## Acknowledgements
 Inspired by [pluGET](https://github.com/Neocky/pluGET)
