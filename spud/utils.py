@@ -49,7 +49,7 @@ class Utils:
         safe_chars = string.ascii_letters
 
         # Split plugin name by common separators
-        split_name = re.split("[-|/!\[\]<>~•×✘]", plugin.get("name"))
+        split_name = re.split("[-|/!\[\]<>~•·×✘]", plugin.get("name"))
         name = ""
         # If a split doesn't contain any safe characters we can assume it is fluff
         # this should remove segments like (1.13-1.17) at the beginning of names
