@@ -14,11 +14,11 @@ class TestAPI(unittest.TestCase):
                 os.remove(file)
 
     def test_search_plugins(self):
-        res = self.spiget.search_plugins("EssentialsX")
+        res = self.spiget.search_plugins("LuckPerms")
         self.assertTrue(type(res) == list and type(res[0]) == dict)
 
     def test_download_plugin(self):
-        plugin = self.spiget.search_plugins("EssentialsX")[0]
+        plugin = self.spiget.search_plugins("LuckPerms")[0]
         result = self.spiget.download_plugin(plugin)
         self.assertTrue(result.get("status"))
 
