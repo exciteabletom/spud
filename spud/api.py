@@ -11,25 +11,25 @@ class SpigetAPI:
     def __init__(
         self,
         base_api_url=settings.BASE_API_URL,
+        user_agent=settings.USER_AGENT,
     ):
-        self.headers: dict = {
-            "user-agent": settings.USER_AGENT,
-        }
 
         self.base_api_url = base_api_url
+
+        self.headers: dict = {
+            "user-agent": user_agent,
+        }
 
     def build_api_url(self, api_request: str) -> str:
         return f"{self.base_api_url}{api_request}"
 
     # noinspection PyDefaultArgument
     def call_api(self, api_request: str, params: dict = {}) -> requests.Response:
-        response: requests.Response = requests.get(
+        return requests.get(
             self.build_api_url(api_request),
             params=params,
             headers=self.headers,
         )
-
-        return response
 
     def get_plugin_by_id(self, plugin_id: int) -> dict:
         response = self.call_api(f"/resources/{plugin_id}")
@@ -38,40 +38,44 @@ class SpigetAPI:
     def search_plugins(self, search_name: str) -> list:
         names = [search_name]
         split_name: str = Utils.split_title_case(search_name)
-        names += split_name.split(" ")
-        fields = ("tag", "name")
+        if split_name:
+            names.append(split_name)
 
         plugin_list = []
+
         for name in names:
-            for field in fields:
-                response = self.call_api(
-                    f"/search/resources/{name}",
-                    {
-                        "field": field,
-                        "sort": "-downloads",
-                        "size": 10,
-                    },
-                )
-                if response.status_code == 200:
-                    plugin_list += response.json()
+            response = self.call_api(
+                f"/search/resources/{name}",
+                {
+                    "field": "name",
+                    "sort": "-downloads",
+                    "size": 5,
+                },
+            )
+            if response.status_code == 200:
+                plugin_list += response.json()
 
         if len(plugin_list) == 0:
             Utils.error(f"No plugin with name {search_name} found.", do_exit=False)
             return []
 
-        # Sort the list by highest download, then IDs
+        # Sort the list by highest downloads, then IDs
         plugin_list.sort(key=operator.itemgetter("downloads", "id"), reverse=True)
 
-        # remove duplicate ids from list
+        # Remove duplicate ids from list
         plugin_list = [id_field[0] for id_field in itertools.groupby(plugin_list)]
 
         sorted_list = []
         for index, plugin in enumerate(plugin_list):
-            if (
-                search_name.upper() in plugin.get("name").upper()
-                or split_name.upper() in plugin.get("name").upper()
-            ):
-                sorted_list = [plugin] + sorted_list
+            # Exact match goes to first index
+            if search_name.upper() == plugin.get("name").upper():
+                sorted_list.insert(0, plugin)
+
+            # Fuzzy match goes to second index
+            elif search_name.upper() in plugin.get("name").upper():
+                sorted_list.insert(1, plugin)
+
+            # Everything else just gets appended to the end
             else:
                 sorted_list.append(plugin)
 
@@ -138,4 +142,10 @@ class SpigetAPI:
             return StatusDict(True, f"Updated {plugin.get('name')} to latest version")
 
     def get_author(self, author_id: int) -> dict:
+        """
+        Gets an Author dict from an ID
+
+        :param author_id: The ID of an author
+        :return: A dict representing the author
+        """
         return self.call_api(f"/authors/{author_id}").json()

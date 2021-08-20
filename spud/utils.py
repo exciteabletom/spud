@@ -31,7 +31,7 @@ class Utils:
 
     @staticmethod
     def sanitise_input(text: str) -> str:
-        # TODO
+        # TODO: Is this needed?
         return text
 
     @staticmethod
