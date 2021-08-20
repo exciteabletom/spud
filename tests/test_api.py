@@ -13,6 +13,13 @@ class TestAPI(unittest.TestCase):
             if file.endswith(".jar"):
                 os.remove(file)
 
+    def test_build_api_url(self):
+        api_path = "/testing/api/test"
+        self.assertEqual(
+            self.spiget.build_api_url("/testing/api/test"),
+            f"{self.spiget.base_api_url}{api_path}",
+        )
+
     def test_search_plugins(self):
         res = self.spiget.search_plugins("LuckPerms")
         self.assertTrue(type(res) == list and type(res[0]) == dict)
