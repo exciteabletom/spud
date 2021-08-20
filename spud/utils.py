@@ -86,6 +86,10 @@ class Utils:
 
     @staticmethod
     def status(text) -> None:
+        print(Fore.LIGHTWHITE_EX + text + Fore.RESET)
+
+    @staticmethod
+    def status_good(text) -> None:
         print(Fore.GREEN + text + Fore.RESET)
 
     @staticmethod
@@ -102,7 +106,7 @@ class Utils:
     def prompt(text) -> str:
         try:
             return input(Fore.CYAN + text + ": " + Fore.RESET)
-        except (KeyboardInterrupt, EOFError):
+        except KeyboardInterrupt:
             sys.exit(1)
 
     @staticmethod

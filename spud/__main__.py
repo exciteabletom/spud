@@ -34,7 +34,8 @@ class Main:
         args = parser.parse_args()
         return args
 
-    def get_plugin_choice(self, plugin_list: list) -> dict:
+    @staticmethod
+    def get_plugin_choice(plugin_list: list) -> dict:
         Utils.separator()
         for index, plugin in enumerate(plugin_list):
             Utils.status(
@@ -45,12 +46,14 @@ class Main:
 
         while True:
             try:
-                chosen_ID: int = int(Utils.prompt("Select a plugin ID (-1 to skip)"))
+                chosen_ID: int = int(
+                    Utils.prompt("Select a plugin ID (Ctrl-D to skip)")
+                )
             except ValueError:
                 continue
-
-            if chosen_ID == -1:
+            except EOFError:
                 return {}
+
             if 0 <= chosen_ID < len(plugin_list):
                 return plugin_list[chosen_ID]
             else:
@@ -66,7 +69,7 @@ class Main:
 
                 plugin_list = self.spiget_api.search_plugins(plugin_name)
 
-                Utils.warning(f"Query: {plugin_name}")
+                Utils.status_good(f"Query: {plugin_name}")
                 plugin = self.get_plugin_choice(plugin_list)
 
                 if not plugin:
