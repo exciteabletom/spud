@@ -13,7 +13,6 @@ class SpigetAPI:
         base_api_url=settings.BASE_API_URL,
         user_agent=settings.USER_AGENT,
     ):
-
         self.base_api_url = base_api_url
 
         self.headers: dict = {
