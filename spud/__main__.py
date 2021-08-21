@@ -35,7 +35,7 @@ class Main:
         return args
 
     @staticmethod
-    def get_plugin_choice(plugin_list: list) -> dict:
+    def get_plugin_choice(plugin_list: list) -> dict or None:
         Utils.separator()
         for index, plugin in enumerate(plugin_list):
             Utils.status(
@@ -52,7 +52,7 @@ class Main:
             except ValueError:
                 continue
             except EOFError:
-                return {}
+                return None
 
             if 0 <= chosen_ID < len(plugin_list):
                 return plugin_list[chosen_ID]

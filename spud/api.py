@@ -55,7 +55,7 @@ class SpigetAPI:
                 plugin_list += response.json()
 
         if len(plugin_list) == 0:
-            Utils.error(f"No plugin with name {search_name} found.", do_exit=False)
+            Utils.error(f"No plugin with name {search_name} found.", fatal=False)
             return []
 
         # Sort the list by highest downloads, then IDs
