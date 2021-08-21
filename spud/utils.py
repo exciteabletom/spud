@@ -2,6 +2,8 @@ import json
 import re
 import string
 import sys
+from enum import Enum, unique
+from typing import Union
 import zipfile
 
 import emoji
@@ -9,33 +11,22 @@ from colorama import Fore
 from colorama import init as init_colorama
 
 from . import settings
+from .types import Plugin, Metadata
 
 
-class StatusDict(dict):
-    """
-    A dict of form:
-        {
-            status: bool,
-            message: str
-        }
-    """
-
-    def __init__(self, status, message=""):
-        super().__init__()
-        self["status"] = status
-        self["message"] = message
+@unique
+class Color(Enum):
+    STATUS = Fore.LIGHTWHITE_EX
+    SUCCESS = Fore.GREEN
+    WARNING = Fore.YELLOW
+    ERROR = Fore.RED
 
 
 class Utils:
     init_colorama()
 
     @staticmethod
-    def sanitise_input(text: str) -> str:
-        # TODO: Is this needed?
-        return text
-
-    @staticmethod
-    def sanitise_api_plugin(plugin: dict) -> dict:
+    def sanitise_api_plugin(plugin: Plugin) -> Plugin:
         """
         This method tries it's best to remove garbage from plugin names and tags.
 
@@ -44,15 +35,15 @@ class Utils:
 
         becomes: "Plugin Name"
 
-        :return: Plugin dict with name and tag value sanitised from BS
+        :return: Plugin dict with BS removed
         """
-        safe_chars = string.ascii_letters
+        safe_chars: str = string.ascii_letters
 
         # Split plugin name by common separators
-        split_name = re.split("[-|/!\\[\\]<>~•·×✘]", plugin.get("name"))
+        split_name = re.split("[-|/!\\[\\]<>~•·×✘]", plugin["name"])
         name = ""
         # If a split doesn't contain any safe characters we can assume it is fluff
-        # this should remove segments like (1.13-1.17) at the beginning of names
+        # this should remove splits like (1.13-1.17) at the beginning of names
         for split in split_name:
             for char in split:
                 if char in safe_chars:
@@ -69,13 +60,12 @@ class Utils:
         # Remove leading and trailing whitespace
         plugin["name"] = name.strip()
 
-        plugin["tag"] = plugin.get("tag").replace("|", "-")
+        plugin["tag"] = plugin["tag"].replace("|", "-")
 
         return plugin
 
     @staticmethod
     def create_jar_name(text: str) -> str:
-        text = Utils.sanitise_input(text)
         return text.translate(str.maketrans("", "", string.whitespace)) + ".jar"
 
     @staticmethod
@@ -85,65 +75,71 @@ class Utils:
         return jar_name
 
     @staticmethod
-    def status(text) -> None:
-        print(Fore.LIGHTWHITE_EX + text + Fore.RESET)
+    def format_text(text: str, ansi_color: Color, print_text=True) -> Union[str, None]:
+        str_color: str = str(ansi_color.value)
 
-    @staticmethod
-    def status_good(text) -> None:
-        print(Fore.GREEN + text + Fore.RESET)
+        formatted_text = str_color + text + Fore.RESET
+        if print_text:
+            print(formatted_text)
+            return None
+        else:
+            return formatted_text
 
-    @staticmethod
-    def error(text, fatal=True) -> None:
-        print(Fore.RED + text + Fore.RESET)
-        if fatal:
-            sys.exit(1)
-
-    @staticmethod
-    def warning(text) -> None:
-        print(Fore.YELLOW + text + Fore.RESET)
-
-    @staticmethod
-    def prompt(text) -> str:
+    @classmethod
+    def prompt(cls, text) -> str:
         try:
-            return input(Fore.CYAN + text + ": " + Fore.RESET)
+            return input(cls.format_text(text + ": ", Color.STATUS, print_text=False))
         except KeyboardInterrupt:
             sys.exit(1)
 
     @staticmethod
     def separator() -> None:
-        sep_char = "-"
+        sep_char = "="
         print(Fore.WHITE + (sep_char * 15) + Fore.RESET)
 
     # noinspection PyBroadException
-    @staticmethod
-    def inject_metadata_file(plugin: dict, filename: str) -> None:
+    @classmethod
+    def inject_metadata_file(cls, plugin: Plugin, filename: str) -> None:
         try:
-            metadata = {
-                "search_name": plugin.get("name"),
-                "plugin_id": plugin.get("id"),
-                "plugin_version_id": plugin.get("version").get("id"),
+            metadata: Metadata = {
+                "search_name": plugin["name"],
+                "plugin_id": plugin["id"],
+                "plugin_version_id": plugin["version"]["id"],
             }
 
-            metadata = json.dumps(metadata).encode("UTF-8")
+            metadata_json = json.dumps(metadata).encode("UTF-8")
 
             with zipfile.ZipFile(filename, "a") as jar:
-                jar.writestr(settings.METADATA_FILENAME, metadata)
+                jar.writestr(settings.METADATA_FILENAME, metadata_json)
         except:
-            Utils.error("Could not write metadata file due to an unknown error!")
+            cls.format_text(
+                "Could not write metadata file due to an unknown error", Color.ERROR
+            )
 
-    # noinspection PyBroadException
     @staticmethod
-    def load_metadata_file(filename: str) -> dict:
+    def load_metadata_file(filename: str) -> Union[Metadata, None]:
         try:
             with zipfile.ZipFile(filename) as jar:
-                metadata: str = jar.read(settings.METADATA_FILENAME).decode("UTF-8")
-                metadata: dict = json.loads(metadata)
+                metadata_str: str = jar.read(settings.METADATA_FILENAME).decode("UTF-8")
+
+                tmp_metadata: dict = json.loads(metadata_str)
+
+                # Validate that the keys in the metadata are of the correct type
+                # to satisfy the type checker
+                for key, value in Metadata.__annotations__.items():
+                    if not type(tmp_metadata[key]) == value:
+                        raise TypeError
+
+                metadata: Metadata = {
+                    "search_name": tmp_metadata["search_name"],
+                    "plugin_id": tmp_metadata["plugin_id"],
+                    "plugin_version_id": tmp_metadata["plugin_version_id"],
+                }
+
                 return metadata
 
-        except (FileNotFoundError, KeyError):
-            return {}
-        except:
-            Utils.error(f"Could not read metadata file due to unknown error.")
+        except (FileNotFoundError, KeyError, zipfile.BadZipfile):
+            return None
 
     @staticmethod
     def split_title_case(text: str) -> str:

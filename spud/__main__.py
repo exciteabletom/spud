@@ -1,19 +1,118 @@
 import argparse
 import os
 from pathlib import Path
+from typing import Collection, Union
 
 from . import api
-from .utils import Utils
+from .utils import Utils, Color
+from .types import StatusDict
 
 
 class Main:
-    def __init__(self, api_instance):
-        self.spiget_api: api.SpigetAPI = api_instance
+    """
+    Class for handling program arguments and providing a user interface for the API backend
+    """
+
+    def __init__(self, api_class=api.SpigetAPI) -> None:
+        """Initialise the cli application"""
+        self.api = api_class()
+
+        self.args = self.parse_args()
+
+        os.chdir(self.args.directory)
+
+        if self.args.action == "install":
+            self.install(self.args.plugins)
+        elif self.args.action == "update":
+            self.update(self.args.plugins)
+        else:
+            Utils.format_text(f"Action {self.args.action} does not exist", Color.ERROR)
+
+    def install(self, plugins: Collection[str]) -> None:
+        """
+        Download the jars for a list of plugins and save it as a file.
+
+        :param plugins: A list of plugin names or jar filenames
+        """
+        for plugin_name in plugins:
+            plugin_name = Utils.get_plugin_name_from_jar(plugin_name)
+
+            plugin_list = self.api.search_plugins(plugin_name)
+
+            if not plugin_list:
+                Utils.format_text(
+                    f"No plugin with name {plugin_name} found.", Color.ERROR
+                )
+                continue
+
+            Utils.format_text(f"Query: {plugin_name}", Color.SUCCESS)
+
+            if self.args.noninteractive:
+                plugin = plugin_list[0]
+            else:
+                plugin = self.get_plugin_choice(plugin_list)
+
+            if not plugin:
+                Utils.format_text("Skipping!", Color.WARNING)
+                continue
+
+            Utils.format_text(f"Installing {plugin.get('name')}", Color.STATUS)
+
+            result: dict = self.api.download_plugin(plugin)
+
+            if result.get("status"):
+                Utils.format_text(
+                    f"{plugin.get('name')} was installed successfully",
+                    Color.SUCCESS,
+                )
+            else:
+                Utils.format_text(result["message"], Color.WARNING)
+        pass
+
+    def update(self, plugins: Collection[str]) -> None:
+        """
+        Check if plugins need updates, and if they do update them.
+
+        :param plugins: An list of plugin names or jar filenames
+        """
+        if not plugins:
+            file_list = os.listdir()
+            plugins = [i for i in file_list if i.endswith(".jar")]
+            Utils.format_text(
+                f"Detected {len(plugins)} plugins in {os.getcwd()}", Color.STATUS
+            )
+
+        update_count = 0
+        for plugin_name in plugins:
+            filename = plugin_name
+            if ".jar" not in filename:
+                filename = Utils.create_jar_name(plugin_name)
+
+            result: StatusDict = self.api.download_plugin_if_update(filename)
+
+            if result.get("status"):
+                update_count += 1
+                color = Color.SUCCESS
+            else:
+                color = Color.WARNING
+
+            if message := result.get("message"):
+                Utils.format_text(message, color)
+
+        Utils.separator()
+        Utils.format_text(
+            f"{update_count} updated, {len(plugins) - update_count} left unchanged",
+            Color.STATUS,
+        )
 
     @staticmethod
-    def parse_args():
+    def parse_args() -> argparse.Namespace:
+        """
+        :return: an argparse.Namespace instance for the program's arguments
+        """
         parser = argparse.ArgumentParser(
-            description="Spud: The plugin manager for your Spigot Minecraft server"
+            description="Spud: The plugin manager for your Spigot Minecraft server",
+            epilog="Licensed under GPLv3 (https://www.gnu.org/licenses/gpl-3.0.en.html)",
         )
         parser.add_argument("action", help="install or update", type=str)
         parser.add_argument(
@@ -24,6 +123,13 @@ class Main:
             nargs="*",
         )
         parser.add_argument(
+            "-n",
+            dest="noninteractive",
+            help="run without asking for input",
+            action="store_true",
+            default=False,
+        )
+        parser.add_argument(
             "-d",
             "--directory",
             dest="directory",
@@ -31,22 +137,22 @@ class Main:
             type=Path,
             default=".",
         )
-        args = parser.parse_args()
-        return args
+        return parser.parse_args()
 
     @staticmethod
-    def get_plugin_choice(plugin_list: list) -> dict or None:
+    def get_plugin_choice(plugin_list: list) -> Union[dict, None]:
         Utils.separator()
         for index, plugin in enumerate(plugin_list):
-            Utils.status(
-                f"{index} | {plugin.get('name')} by {plugin.get('author').get('name')} | {plugin.get('tag')}"
+            Utils.format_text(
+                f"{index} | {plugin.get('name')} by {plugin.get('author').get('name')} | {plugin.get('tag')}",
+                Color.STATUS,
             )
 
         Utils.separator()
 
         while True:
             try:
-                chosen_ID: int = int(
+                chosen_id: int = int(
                     Utils.prompt("Select a plugin ID (Ctrl-D to skip)")
                 )
             except ValueError:
@@ -54,59 +160,12 @@ class Main:
             except EOFError:
                 return None
 
-            if 0 <= chosen_ID < len(plugin_list):
-                return plugin_list[chosen_ID]
+            if 0 <= chosen_id < len(plugin_list):
+                return plugin_list[chosen_id]
             else:
                 continue
 
-    def main(self):
-        args = self.parse_args()
-        os.chdir(args.directory)
-
-        if args.action == "install":
-            for plugin_name in args.plugins:
-                plugin_name = Utils.get_plugin_name_from_jar(plugin_name)
-
-                plugin_list = self.spiget_api.search_plugins(plugin_name)
-
-                Utils.status_good(f"Query: {plugin_name}")
-                plugin = self.get_plugin_choice(plugin_list)
-
-                if not plugin:
-                    Utils.warning("Skipping!")
-                    continue
-
-                Utils.status(f"Installing {plugin.get('name')}")
-
-                result: dict = self.spiget_api.download_plugin(plugin)
-
-                if result.get("status"):
-                    Utils.status(f"{plugin.get('name')} was installed successfully")
-                else:
-                    Utils.warning(result.get("message"))
-
-        elif args.action == "update":
-            if not args.plugins:
-                args.plugins = os.listdir()
-                plugins = [i for i in args.plugins if i.endswith(".jar")]
-            else:
-                plugins = args.plugins
-
-            for plugin_name in plugins:
-                filename = plugin_name
-                if ".jar" not in filename:
-                    filename = Utils.create_jar_name(plugin_name)
-
-                result = self.spiget_api.download_plugin_if_update(filename)
-
-                if result.get("status"):
-                    Utils.status(result.get("message"))
-                else:
-                    Utils.warning(result.get("message"))
-
-        else:
-            Utils.error(f"Action {args.action} does not exist")
-
 
 def init():
-    Main(api.SpigetAPI()).main()
+    """Mainline function called when app starts"""
+    Main()
