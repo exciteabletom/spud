@@ -14,6 +14,7 @@ Run `spud -h` to see all the options.
 
 ## Example usages
 - Install a plugin: `spud install PluginName`
+- Install a plugin without prompting for input: `spud -n install PluginName`
 - Update all plugins in the working directory: `spud update`
 - Update all plugins in `~/server/plugins`: `spud -d ~/server/plugins update`
 - Update plugin `myplugin.jar`: `spud update myplugin.jar` or `spud update myplugin`
