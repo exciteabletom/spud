@@ -13,7 +13,8 @@ class Main:
     @staticmethod
     def parse_args():
         parser = argparse.ArgumentParser(
-            description="Spud: The plugin manager for your Spigot Minecraft server"
+            description="Spud: The plugin manager for your Spigot Minecraft server",
+            epilog="Licensed under GPLv3 (https://www.gnu.org/licenses/gpl-3.0.en.html)",
         )
         parser.add_argument("action", help="install or update", type=str)
         parser.add_argument(
