@@ -25,7 +25,7 @@ Spud tries its best to extract the plugin name, but it will fail if there is cop
 - Spud can't update plugins it has not installed. Make sure to install the plugin with Spud first, so it can save a metadata file to the jar.
 
 
-- Spud can't install external resources or resources not listed on https://spigotmc.org
+- Spud can't install resources not listed on https://spigotmc.org
 
 ## Acknowledgements
 Inspired by [pluGET](https://github.com/Neocky/pluGET)
