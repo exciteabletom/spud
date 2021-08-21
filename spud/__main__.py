@@ -24,6 +24,13 @@ class Main:
             nargs="*",
         )
         parser.add_argument(
+            "-n",
+            dest="noninteractive",
+            help="run without asking for input",
+            action="store_true",
+            default=False,
+        )
+        parser.add_argument(
             "-d",
             "--directory",
             dest="directory",
@@ -69,8 +76,18 @@ class Main:
 
                 plugin_list = self.spiget_api.search_plugins(plugin_name)
 
+                if not plugin_list:
+                    Utils.error(
+                        f"No plugin with name {plugin_name} found.", fatal=False
+                    )
+                    continue
+
                 Utils.status_good(f"Query: {plugin_name}")
-                plugin = self.get_plugin_choice(plugin_list)
+
+                if args.noninteractive:
+                    plugin = plugin_list[0]
+                else:
+                    plugin = self.get_plugin_choice(plugin_list)
 
                 if not plugin:
                     Utils.warning("Skipping!")

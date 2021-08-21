@@ -34,7 +34,7 @@ class SpigetAPI:
         response = self.call_api(f"/resources/{plugin_id}")
         return response.json()
 
-    def search_plugins(self, search_name: str) -> list:
+    def search_plugins(self, search_name: str) -> list or None:
         names = [search_name]
         split_name: str = Utils.split_title_case(search_name)
         if split_name:
@@ -55,8 +55,7 @@ class SpigetAPI:
                 plugin_list += response.json()
 
         if len(plugin_list) == 0:
-            Utils.error(f"No plugin with name {search_name} found.", fatal=False)
-            return []
+            return None
 
         # Sort the list by highest downloads, then IDs
         plugin_list.sort(key=operator.itemgetter("downloads", "id"), reverse=True)
