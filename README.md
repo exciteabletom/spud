@@ -7,7 +7,9 @@ A cross-platform, [Spigot](https://www.spigotmc.org/) plugin manager that adhere
 Work in progress.
 
 ## Installation
-Install with `pip install spud-mc`
+Python 3.6 or later is required
+
+Install with `python -m pip install spud-mc`
 
 Run `spud -h` to see all the options.
 
