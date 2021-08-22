@@ -7,8 +7,8 @@ from .utils import Utils
 
 
 class Main:
-    def __init__(self, api_instance):
-        self.spiget_api: api.SpigetAPI = api_instance
+    def __init__(self, api_class):
+        self.spiget_api = api_class()
 
     @staticmethod
     def parse_args():
@@ -127,4 +127,4 @@ class Main:
 
 
 def init():
-    Main(api.SpigetAPI()).main()
+    Main(api.SpigetAPI).main()
