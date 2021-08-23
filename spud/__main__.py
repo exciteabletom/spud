@@ -51,7 +51,7 @@ class Main:
                 Utils.format_text("Skipping!", colors["warning"])
                 continue
 
-            Utils.status(f"Installing {plugin.get('name')}")
+            Utils.format_text(f"Installing {plugin.get('name')}", colors["status"])
 
             result: dict = self.spiget_api.download_plugin(plugin)
 
@@ -68,7 +68,11 @@ class Main:
         if not plugins:
             file_list = os.listdir()
             plugins = [i for i in file_list if i.endswith(".jar")]
+            Utils.format_text(
+                f"Detected {len(plugins)} plugins in {os.getcwd()}", colors["status"]
+            )
 
+        update_count = 0
         for plugin_name in plugins:
             filename = plugin_name
             if ".jar" not in filename:
@@ -76,8 +80,20 @@ class Main:
 
             result: StatusDict = self.spiget_api.download_plugin_if_update(filename)
 
+            if result.get("status"):
+                update_count += 1
+                color = colors["success"]
+            else:
+                color = colors["warning"]
+
             if message := result.get("message"):
-                print(message)
+                Utils.format_text(message, color)
+
+        Utils.separator()
+        Utils.format_text(
+            f"{update_count} updated, {len(plugins) - update_count} left unchanged",
+            colors["status"],
+        )
 
     @staticmethod
     def parse_args() -> argparse.Namespace:

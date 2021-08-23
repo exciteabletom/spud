@@ -122,11 +122,7 @@ class SpigetAPI:
         if not metadata:
             return StatusDict(
                 False,
-                Utils.format_text(
-                    f"Couldn't load metadata for {filename}. Try reinstalling with spud first",
-                    colors["warning"],
-                    print_text=False,
-                ),
+                f"Couldn't load metadata for {filename}. Try reinstalling with spud first",
             )
 
         plugin_id: int = metadata.get("plugin_id")
@@ -136,16 +132,12 @@ class SpigetAPI:
         latest_version: int = plugin.get("versions")[0].get("id")
 
         if local_version >= latest_version:
-            return StatusDict(True)
+            return StatusDict(False)
         else:
             self.download_plugin(plugin, filename)
             return StatusDict(
                 True,
-                Utils.format_text(
-                    f"Updated {plugin.get('name')} to latest version",
-                    colors["success"],
-                    print_text=False,
-                ),
+                f"Updated {plugin.get('name')} to latest version",
             )
 
     def get_author(self, author_id: int) -> dict:

@@ -27,10 +27,8 @@ class StatusDict(dict):
         }
     """
 
-    def __init__(self, status, message=""):
-        super().__init__()
-        self["status"] = status
-        self["message"] = message
+    def __init__(self, status: bool, message: str = ""):
+        super().__init__(status=status, message=message)
 
 
 class Utils:
@@ -92,24 +90,6 @@ class Utils:
         return jar_name
 
     @staticmethod
-    def status(text) -> None:
-        print(Fore.LIGHTWHITE_EX + text + Fore.RESET)
-
-    @staticmethod
-    def status_good(text) -> None:
-        print(Fore.GREEN + text + Fore.RESET)
-
-    @staticmethod
-    def error(text, fatal=True) -> None:
-        print(Fore.RED + text + Fore.RESET)
-        if fatal:
-            sys.exit(1)
-
-    @staticmethod
-    def warning(text) -> None:
-        print(Fore.YELLOW + text + Fore.RESET)
-
-    @staticmethod
     def format_text(text: str, ansi_color: str, print_text=True) -> str or None:
         formatted_text = ansi_color + text + Fore.RESET
         if print_text:
@@ -117,16 +97,16 @@ class Utils:
         else:
             return formatted_text
 
-    @staticmethod
-    def prompt(text) -> str:
+    @classmethod
+    def prompt(cls, text) -> str:
         try:
-            return input(text + ": ")
+            return input(cls.format_text(text + ": ", colors["status"], print_text=False))
         except KeyboardInterrupt:
             sys.exit(1)
 
     @staticmethod
     def separator() -> None:
-        sep_char = "-"
+        sep_char = "="
         print(Fore.WHITE + (sep_char * 15) + Fore.RESET)
 
     # noinspection PyBroadException
@@ -150,19 +130,15 @@ class Utils:
 
     # noinspection PyBroadException
     @staticmethod
-    def load_metadata_file(filename: str) -> dict:
+    def load_metadata_file(filename: str) -> dict or None:
         try:
             with zipfile.ZipFile(filename) as jar:
                 metadata: str = jar.read(settings.METADATA_FILENAME).decode("UTF-8")
                 metadata: dict = json.loads(metadata)
                 return metadata
 
-        except (FileNotFoundError, KeyError):
-            return {}
-        except:
-            Utils.format_text(
-                f"Could not read metadata file due to unknown error", colors["error"]
-            )
+        except (FileNotFoundError, KeyError, zipfile.BadZipfile):
+            return None
 
     @staticmethod
     def split_title_case(text: str) -> str:
