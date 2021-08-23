@@ -10,6 +10,13 @@ from colorama import init as init_colorama
 
 from . import settings
 
+colors = {
+    "error": Fore.RED,
+    "warning": Fore.YELLOW,
+    "status": Fore.LIGHTWHITE_EX,
+    "success": Fore.GREEN,
+}
+
 
 class StatusDict(dict):
     """
@@ -103,9 +110,17 @@ class Utils:
         print(Fore.YELLOW + text + Fore.RESET)
 
     @staticmethod
+    def format_text(text: str, ansi_color: str, print_text=True) -> str or None:
+        formatted_text = ansi_color + text + Fore.RESET
+        if print_text:
+            print(formatted_text)
+        else:
+            return formatted_text
+
+    @staticmethod
     def prompt(text) -> str:
         try:
-            return input(Fore.CYAN + text + ": " + Fore.RESET)
+            return input(text + ": ")
         except KeyboardInterrupt:
             sys.exit(1)
 
@@ -129,7 +144,9 @@ class Utils:
             with zipfile.ZipFile(filename, "a") as jar:
                 jar.writestr(settings.METADATA_FILENAME, metadata)
         except:
-            Utils.error("Could not write metadata file due to an unknown error!")
+            Utils.format_text(
+                "Could not write metadata file due to an unknown error", colors["error"]
+            )
 
     # noinspection PyBroadException
     @staticmethod
@@ -143,7 +160,9 @@ class Utils:
         except (FileNotFoundError, KeyError):
             return {}
         except:
-            Utils.error(f"Could not read metadata file due to unknown error.")
+            Utils.format_text(
+                f"Could not read metadata file due to unknown error", colors["error"]
+            )
 
     @staticmethod
     def split_title_case(text: str) -> str:
