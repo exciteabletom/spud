@@ -35,11 +35,6 @@ class Utils:
     init_colorama()
 
     @staticmethod
-    def sanitise_input(text: str) -> str:
-        # TODO: Is this needed?
-        return text
-
-    @staticmethod
     def sanitise_api_plugin(plugin: dict) -> dict:
         """
         This method tries it's best to remove garbage from plugin names and tags.
@@ -57,7 +52,7 @@ class Utils:
         split_name = re.split("[-|/!\\[\\]<>~•·×✘]", plugin.get("name"))
         name = ""
         # If a split doesn't contain any safe characters we can assume it is fluff
-        # this should remove segments like (1.13-1.17) at the beginning of names
+        # this should remove splits like (1.13-1.17) at the beginning of names
         for split in split_name:
             for char in split:
                 if char in safe_chars:
@@ -80,7 +75,6 @@ class Utils:
 
     @staticmethod
     def create_jar_name(text: str) -> str:
-        text = Utils.sanitise_input(text)
         return text.translate(str.maketrans("", "", string.whitespace)) + ".jar"
 
     @staticmethod
