@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 from . import api
-from .utils import Utils, StatusDict, colors
+from .utils import Utils, StatusDict, Color
 
 
 class Main:
@@ -25,7 +25,7 @@ class Main:
             self.update(self.args.plugins)
         else:
             Utils.format_text(
-                f"Action {self.args.action} does not exist", colors["error"]
+                f"Action {self.args.action} does not exist", Color.ERROR
             )
 
     def install(self, plugins):
@@ -36,11 +36,11 @@ class Main:
 
             if not plugin_list:
                 Utils.format_text(
-                    f"No plugin with name {plugin_name} found.", colors["error"]
+                    f"No plugin with name {plugin_name} found.", Color.ERROR
                 )
                 continue
 
-            Utils.format_text(f"Query: {plugin_name}", colors["success"])
+            Utils.format_text(f"Query: {plugin_name}", Color.SUCCESS)
 
             if self.args.noninteractive:
                 plugin = plugin_list[0]
@@ -48,20 +48,20 @@ class Main:
                 plugin = self.get_plugin_choice(plugin_list)
 
             if not plugin:
-                Utils.format_text("Skipping!", colors["warning"])
+                Utils.format_text("Skipping!", Color.WARNING)
                 continue
 
-            Utils.format_text(f"Installing {plugin.get('name')}", colors["status"])
+            Utils.format_text(f"Installing {plugin.get('name')}", Color.STATUS)
 
             result: dict = self.spiget_api.download_plugin(plugin)
 
             if result.get("status"):
                 Utils.format_text(
                     f"{plugin.get('name')} was installed successfully",
-                    colors["success"],
+                    Color.SUCCESS,
                 )
             else:
-                Utils.format_text(result.get("message"), colors["warning"])
+                Utils.format_text(result.get("message"), Color.WARNING)
         pass
 
     def update(self, plugins):
@@ -69,7 +69,7 @@ class Main:
             file_list = os.listdir()
             plugins = [i for i in file_list if i.endswith(".jar")]
             Utils.format_text(
-                f"Detected {len(plugins)} plugins in {os.getcwd()}", colors["status"]
+                f"Detected {len(plugins)} plugins in {os.getcwd()}", Color.STATUS
             )
 
         update_count = 0
@@ -82,9 +82,9 @@ class Main:
 
             if result.get("status"):
                 update_count += 1
-                color = colors["success"]
+                color = Color.SUCCESS
             else:
-                color = colors["warning"]
+                color = Color.WARNING
 
             if message := result.get("message"):
                 Utils.format_text(message, color)
@@ -92,7 +92,7 @@ class Main:
         Utils.separator()
         Utils.format_text(
             f"{update_count} updated, {len(plugins) - update_count} left unchanged",
-            colors["status"],
+            Color.STATUS
         )
 
     @staticmethod
@@ -132,7 +132,7 @@ class Main:
         for index, plugin in enumerate(plugin_list):
             Utils.format_text(
                 f"{index} | {plugin.get('name')} by {plugin.get('author').get('name')} | {plugin.get('tag')}",
-                colors["status"],
+                Color.STATUS
             )
 
         Utils.separator()

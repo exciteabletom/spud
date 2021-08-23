@@ -3,6 +3,7 @@ import re
 import string
 import sys
 import zipfile
+from enum import Enum
 
 import emoji
 from colorama import Fore
@@ -10,12 +11,12 @@ from colorama import init as init_colorama
 
 from . import settings
 
-colors = {
-    "error": Fore.RED,
-    "warning": Fore.YELLOW,
-    "status": Fore.LIGHTWHITE_EX,
-    "success": Fore.GREEN,
-}
+
+class Color(Enum):
+    STATUS = Fore.LIGHTWHITE_EX
+    SUCCESS = Fore.GREEN
+    WARNING = Fore.YELLOW
+    ERROR = Fore.RED
 
 
 class StatusDict(dict):
@@ -84,7 +85,7 @@ class Utils:
         return jar_name
 
     @staticmethod
-    def format_text(text: str, ansi_color: str, print_text=True) -> str or None:
+    def format_text(text: str, ansi_color: Color, print_text=True) -> str or None:
         formatted_text = ansi_color + text + Fore.RESET
         if print_text:
             print(formatted_text)
@@ -94,7 +95,7 @@ class Utils:
     @classmethod
     def prompt(cls, text) -> str:
         try:
-            return input(cls.format_text(text + ": ", colors["status"], print_text=False))
+            return input(cls.format_text(text + ": ", Color.STATUS, print_text=False))
         except KeyboardInterrupt:
             sys.exit(1)
 
@@ -104,8 +105,8 @@ class Utils:
         print(Fore.WHITE + (sep_char * 15) + Fore.RESET)
 
     # noinspection PyBroadException
-    @staticmethod
-    def inject_metadata_file(plugin: dict, filename: str) -> None:
+    @classmethod
+    def inject_metadata_file(cls, plugin: dict, filename: str) -> None:
         try:
             metadata = {
                 "search_name": plugin.get("name"),
@@ -118,11 +119,10 @@ class Utils:
             with zipfile.ZipFile(filename, "a") as jar:
                 jar.writestr(settings.METADATA_FILENAME, metadata)
         except:
-            Utils.format_text(
-                "Could not write metadata file due to an unknown error", colors["error"]
+            cls.format_text(
+                "Could not write metadata file due to an unknown error", Color.ERROR
             )
 
-    # noinspection PyBroadException
     @staticmethod
     def load_metadata_file(filename: str) -> dict or None:
         try:

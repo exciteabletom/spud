@@ -4,7 +4,7 @@ import operator
 import requests
 
 from . import settings
-from .utils import Utils, StatusDict, colors
+from .utils import Utils, StatusDict
 
 
 class SpigetAPI:
