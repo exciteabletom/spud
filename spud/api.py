@@ -1,10 +1,12 @@
 import itertools
 import operator
+from typing import Union
 
 import requests
 
 from . import settings
-from .utils import Utils, StatusDict
+from .types import Plugin, StatusDict, Author, Metadata
+from .utils import Utils
 
 
 class SpigetAPI:
@@ -30,17 +32,17 @@ class SpigetAPI:
             headers=self.headers,
         )
 
-    def get_plugin_by_id(self, plugin_id: int) -> dict:
+    def get_plugin_by_id(self, plugin_id: int) -> Plugin:
         response = self.call_api(f"/resources/{plugin_id}")
         return response.json()
 
-    def search_plugins(self, search_name: str) -> list or None:
+    def search_plugins(self, search_name: str) -> Union[list, None]:
         names = [search_name]
         split_name: str = Utils.split_title_case(search_name)
         if split_name:
             names.append(split_name)
 
-        plugin_list = []
+        plugin_list: list[Plugin] = []
 
         for name in names:
             response = self.call_api(
@@ -49,10 +51,12 @@ class SpigetAPI:
                     "field": "name",
                     "sort": "-downloads",
                     "size": 5,
+                    "fields": "file,name,tag,version,downloads,id,author",
                 },
             )
             if response.status_code == 200:
-                plugin_list += response.json()
+                plugin: Plugin = response.json()[0]
+                plugin_list.append(plugin)
 
         if len(plugin_list) == 0:
             return None
@@ -63,31 +67,33 @@ class SpigetAPI:
         # Remove duplicate ids from list
         plugin_list = [id_field[0] for id_field in itertools.groupby(plugin_list)]
 
-        sorted_list = []
+        sorted_list: list[Plugin] = []
         for index, plugin in enumerate(plugin_list):
             # Exact match goes to first index
-            if search_name.upper() == plugin.get("name").upper():
+            if search_name.upper() == plugin["name"].upper():
                 sorted_list.insert(0, plugin)
 
             # Fuzzy match goes to second index
-            elif search_name.upper() in plugin.get("name").upper():
+            elif search_name.upper() in plugin["name"].upper():
                 sorted_list.insert(1, plugin)
 
             # Everything else just gets appended to the end
             else:
                 sorted_list.append(plugin)
 
-        truncated_list = sorted_list[:10]
+        truncated_list: list[Plugin] = sorted_list[:10]
 
         for plugin in truncated_list:
             Utils.sanitise_api_plugin(plugin)
+            # Author's name ==
             plugin["author"]["name"] = self.get_author(
-                plugin.get("author").get("id")
-            ).get("name")
+                # Author's ID
+                plugin["author"]["id"]
+            )["name"]
 
         return truncated_list
 
-    def download_plugin(self, plugin: dict, filename: str = "") -> StatusDict:
+    def download_plugin(self, plugin: Plugin, filename: str = "") -> StatusDict:
         """
         Download a plugin
 
@@ -100,7 +106,7 @@ class SpigetAPI:
         )
 
         if not filename:
-            plugin_jar_name = Utils.create_jar_name(plugin.get("name"))
+            plugin_jar_name = Utils.create_jar_name(plugin["name"])
         else:
             plugin_jar_name = filename
 
@@ -110,7 +116,7 @@ class SpigetAPI:
 
         Utils.inject_metadata_file(plugin, plugin_jar_name)
 
-        return StatusDict(True)
+        return {"status": True, "message": ""}
 
     def download_plugin_if_update(self, filename: str) -> StatusDict:
         """
@@ -118,29 +124,29 @@ class SpigetAPI:
         :param filename: Filename of a plugin
         :return: StatusDict
         """
-        metadata = Utils.load_metadata_file(filename)
+        metadata: Union[Metadata, None] = Utils.load_metadata_file(filename)
         if not metadata:
-            return StatusDict(
-                False,
-                f"Couldn't load metadata for {filename}. Try reinstalling with spud first",
-            )
+            return {
+                "status": False,
+                "message": f"Couldn't load metadata for {filename}. Try reinstalling with spud first",
+            }
 
-        plugin_id: int = metadata.get("plugin_id")
+        plugin_id: int = metadata["plugin_id"]
         plugin = self.get_plugin_by_id(plugin_id)
 
-        local_version: int = metadata.get("plugin_version_id")
-        latest_version: int = plugin.get("versions")[0].get("id")
+        local_version: int = metadata["plugin_version_id"]
+        latest_version: int = plugin["version"]["id"]
 
         if local_version >= latest_version:
-            return StatusDict(False)
+            return {"status": False, "message": ""}
         else:
             self.download_plugin(plugin, filename)
-            return StatusDict(
-                True,
-                f"Updated {plugin.get('name')} to latest version",
-            )
+            return {
+                "status": True,
+                "message": f"Updated {plugin.get('name')} to latest version",
+            }
 
-    def get_author(self, author_id: int) -> dict:
+    def get_author(self, author_id: int) -> Author:
         """
         Gets an Author dict from an ID
 

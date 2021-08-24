@@ -1,6 +1,7 @@
 import unittest
 
-from spud.utils import Utils, StatusDict
+from spud.types import StatusDict
+from spud.utils import Utils
 
 
 class MyTestCase(unittest.TestCase):
@@ -27,20 +28,6 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(result.get("name"), final_name)
         self.assertEqual(result.get("tag"), final_tag)
-
-    def test_StatusDict(self):
-        message = "Error Occurred!"
-        status_dict = StatusDict(False, message)
-
-        self.assertEqual(type(status_dict), StatusDict)
-        self.assertEqual(status_dict.get("message"), message)
-        self.assertFalse(status_dict.get("status"))
-
-        status_dict = StatusDict(True)
-
-        self.assertEqual(type(status_dict), StatusDict)
-        self.assertEqual(status_dict.get("message"), "")
-        self.assertTrue(status_dict.get("status"))
 
 
 if __name__ == "__main__":

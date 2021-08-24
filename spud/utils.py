@@ -2,16 +2,19 @@ import json
 import re
 import string
 import sys
+from enum import Enum, unique
+from typing import Union
 import zipfile
-from enum import Enum
 
 import emoji
 from colorama import Fore
 from colorama import init as init_colorama
 
 from . import settings
+from .types import Plugin, Metadata
 
 
+@unique
 class Color(Enum):
     STATUS = Fore.LIGHTWHITE_EX
     SUCCESS = Fore.GREEN
@@ -19,24 +22,11 @@ class Color(Enum):
     ERROR = Fore.RED
 
 
-class StatusDict(dict):
-    """
-    A dict of form:
-        {
-            status: bool,
-            message: str
-        }
-    """
-
-    def __init__(self, status: bool, message: str = ""):
-        super().__init__(status=status, message=message)
-
-
 class Utils:
     init_colorama()
 
     @staticmethod
-    def sanitise_api_plugin(plugin: dict) -> dict:
+    def sanitise_api_plugin(plugin: Plugin) -> Plugin:
         """
         This method tries it's best to remove garbage from plugin names and tags.
 
@@ -45,12 +35,12 @@ class Utils:
 
         becomes: "Plugin Name"
 
-        :return: Plugin dict with name and tag value sanitised from BS
+        :return: Plugin dict with BS removed
         """
-        safe_chars = string.ascii_letters
+        safe_chars: str = string.ascii_letters
 
         # Split plugin name by common separators
-        split_name = re.split("[-|/!\\[\\]<>~•·×✘]", plugin.get("name"))
+        split_name = re.split("[-|/!\\[\\]<>~•·×✘]", plugin["name"])
         name = ""
         # If a split doesn't contain any safe characters we can assume it is fluff
         # this should remove splits like (1.13-1.17) at the beginning of names
@@ -70,7 +60,7 @@ class Utils:
         # Remove leading and trailing whitespace
         plugin["name"] = name.strip()
 
-        plugin["tag"] = plugin.get("tag").replace("|", "-")
+        plugin["tag"] = plugin["tag"].replace("|", "-")
 
         return plugin
 
@@ -85,10 +75,13 @@ class Utils:
         return jar_name
 
     @staticmethod
-    def format_text(text: str, ansi_color: Color, print_text=True) -> str or None:
-        formatted_text = ansi_color + text + Fore.RESET
+    def format_text(text: str, ansi_color: Color, print_text=True) -> Union[str, None]:
+        str_color: str = str(ansi_color.value)
+
+        formatted_text = str_color + text + Fore.RESET
         if print_text:
             print(formatted_text)
+            return None
         else:
             return formatted_text
 
@@ -106,29 +99,43 @@ class Utils:
 
     # noinspection PyBroadException
     @classmethod
-    def inject_metadata_file(cls, plugin: dict, filename: str) -> None:
+    def inject_metadata_file(cls, plugin: Plugin, filename: str) -> None:
         try:
-            metadata = {
-                "search_name": plugin.get("name"),
-                "plugin_id": plugin.get("id"),
-                "plugin_version_id": plugin.get("version").get("id"),
+            metadata: Metadata = {
+                "search_name": plugin["name"],
+                "plugin_id": plugin["id"],
+                "plugin_version_id": plugin["version"]["id"],
             }
 
-            metadata = json.dumps(metadata).encode("UTF-8")
+            metadata_json = json.dumps(metadata).encode("UTF-8")
 
             with zipfile.ZipFile(filename, "a") as jar:
-                jar.writestr(settings.METADATA_FILENAME, metadata)
+                jar.writestr(settings.METADATA_FILENAME, metadata_json)
         except:
             cls.format_text(
                 "Could not write metadata file due to an unknown error", Color.ERROR
             )
 
     @staticmethod
-    def load_metadata_file(filename: str) -> dict or None:
+    def load_metadata_file(filename: str) -> Union[Metadata, None]:
         try:
             with zipfile.ZipFile(filename) as jar:
-                metadata: str = jar.read(settings.METADATA_FILENAME).decode("UTF-8")
-                metadata: dict = json.loads(metadata)
+                metadata_str: str = jar.read(settings.METADATA_FILENAME).decode("UTF-8")
+
+                tmp_metadata: dict = json.loads(metadata_str)
+
+                # Validate that the keys in the metadata are of the correct type
+                # to satisfy the type checker
+                for key, value in Metadata.__annotations__.items():
+                    if not type(tmp_metadata[key]) == value:
+                        raise TypeError
+
+                metadata: Metadata = {
+                    "search_name": tmp_metadata["search_name"],
+                    "plugin_id": tmp_metadata["plugin_id"],
+                    "plugin_version_id": tmp_metadata["plugin_version_id"],
+                }
+
                 return metadata
 
         except (FileNotFoundError, KeyError, zipfile.BadZipfile):
