@@ -1,9 +1,11 @@
 import argparse
 import os
 from pathlib import Path
+from typing import Collection, Union
 
 from . import api
-from .utils import Utils, StatusDict, Color
+from .utils import Utils, Color
+from .types import StatusDict
 
 
 class Main:
@@ -11,9 +13,9 @@ class Main:
     Class for handling program arguments and providing a user interface for the API backend
     """
 
-    def __init__(self, api_class):
-        """Initialise a new cli application"""
-        self.spiget_api = api_class()
+    def __init__(self, api_class=api.SpigetAPI) -> None:
+        """Initialise the cli application"""
+        self.api = api_class()
 
         self.args = self.parse_args()
 
@@ -24,15 +26,18 @@ class Main:
         elif self.args.action == "update":
             self.update(self.args.plugins)
         else:
-            Utils.format_text(
-                f"Action {self.args.action} does not exist", Color.ERROR
-            )
+            Utils.format_text(f"Action {self.args.action} does not exist", Color.ERROR)
 
-    def install(self, plugins):
+    def install(self, plugins: Collection[str]) -> None:
+        """
+        Download the jars for a list of plugins and save it as a file.
+
+        :param plugins: A list of plugin names or jar filenames
+        """
         for plugin_name in plugins:
             plugin_name = Utils.get_plugin_name_from_jar(plugin_name)
 
-            plugin_list = self.spiget_api.search_plugins(plugin_name)
+            plugin_list = self.api.search_plugins(plugin_name)
 
             if not plugin_list:
                 Utils.format_text(
@@ -53,7 +58,7 @@ class Main:
 
             Utils.format_text(f"Installing {plugin.get('name')}", Color.STATUS)
 
-            result: dict = self.spiget_api.download_plugin(plugin)
+            result: dict = self.api.download_plugin(plugin)
 
             if result.get("status"):
                 Utils.format_text(
@@ -61,10 +66,15 @@ class Main:
                     Color.SUCCESS,
                 )
             else:
-                Utils.format_text(result.get("message"), Color.WARNING)
+                Utils.format_text(result["message"], Color.WARNING)
         pass
 
-    def update(self, plugins):
+    def update(self, plugins: Collection[str]) -> None:
+        """
+        Check if plugins need updates, and if they do update them.
+
+        :param plugins: An list of plugin names or jar filenames
+        """
         if not plugins:
             file_list = os.listdir()
             plugins = [i for i in file_list if i.endswith(".jar")]
@@ -78,7 +88,7 @@ class Main:
             if ".jar" not in filename:
                 filename = Utils.create_jar_name(plugin_name)
 
-            result: StatusDict = self.spiget_api.download_plugin_if_update(filename)
+            result: StatusDict = self.api.download_plugin_if_update(filename)
 
             if result.get("status"):
                 update_count += 1
@@ -92,11 +102,14 @@ class Main:
         Utils.separator()
         Utils.format_text(
             f"{update_count} updated, {len(plugins) - update_count} left unchanged",
-            Color.STATUS
+            Color.STATUS,
         )
 
     @staticmethod
     def parse_args() -> argparse.Namespace:
+        """
+        :return: an argparse.Namespace instance for the program's arguments
+        """
         parser = argparse.ArgumentParser(
             description="Spud: The plugin manager for your Spigot Minecraft server",
             epilog="Licensed under GPLv3 (https://www.gnu.org/licenses/gpl-3.0.en.html)",
@@ -127,12 +140,12 @@ class Main:
         return parser.parse_args()
 
     @staticmethod
-    def get_plugin_choice(plugin_list: list) -> dict or None:
+    def get_plugin_choice(plugin_list: list) -> Union[dict, None]:
         Utils.separator()
         for index, plugin in enumerate(plugin_list):
             Utils.format_text(
                 f"{index} | {plugin.get('name')} by {plugin.get('author').get('name')} | {plugin.get('tag')}",
-                Color.STATUS
+                Color.STATUS,
             )
 
         Utils.separator()
@@ -154,4 +167,5 @@ class Main:
 
 
 def init():
-    Main(api.SpigetAPI)
+    """Mainline function called when app starts"""
+    Main()

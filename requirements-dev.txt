@@ -1,3 +1,7 @@
 wheel
 pre-commit
 black
+mypy
+types-requests
+types-emoji
+types-colorama
