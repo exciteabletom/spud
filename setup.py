@@ -23,5 +23,5 @@ setuptools.setup(
     },
     package_dir={"spud": "spud"},
     packages=["spud"],
-    python_requires=">=3.6",
+    python_requires=">=3.8",
 )
