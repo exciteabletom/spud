@@ -5,7 +5,7 @@ from typing import Collection, Union
 
 from . import api
 from .utils import Utils, Color
-from .types import StatusDict
+from .type import StatusDict
 
 
 class Main:

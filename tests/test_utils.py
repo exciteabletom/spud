@@ -1,6 +1,6 @@
 import unittest
 
-from spud.types import StatusDict
+from spud.type import StatusDict
 from spud.utils import Utils
 
 

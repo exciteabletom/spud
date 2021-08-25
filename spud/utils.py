@@ -11,7 +11,7 @@ from colorama import Fore
 from colorama import init as init_colorama
 
 from . import settings
-from .types import Plugin, Metadata
+from .type import Plugin, Metadata
 
 
 @unique

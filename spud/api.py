@@ -5,7 +5,7 @@ from typing import Union
 import requests
 
 from . import settings
-from .types import Plugin, StatusDict, Author, Metadata
+from .type import Plugin, StatusDict, Author, Metadata
 from .utils import Utils
 
 
