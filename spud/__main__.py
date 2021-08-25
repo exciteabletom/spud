@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import argparse
+from argparse import Namespace
 import os
 from pathlib import Path
 from typing import Collection, Union
 
 from . import api
 from .utils import Utils, Color
-from .type import StatusDict
+from .type import StatusDict, Plugin
 
 
 class Main:
@@ -19,7 +20,7 @@ class Main:
         """Initialise the cli application"""
         self.api = api_class()
 
-        self.args = self.parse_args()
+        self.args: Namespace = self.parse_args()
 
         os.chdir(self.args.directory)
 
@@ -58,13 +59,13 @@ class Main:
                 Utils.format_text("Skipping!", Color.WARNING)
                 continue
 
-            Utils.format_text(f"Installing {plugin.get('name')}", Color.STATUS)
+            Utils.format_text(f"Installing {plugin['name']}", Color.STATUS)
 
-            result: dict = self.api.download_plugin(plugin)
+            result: StatusDict = self.api.download_plugin(plugin)
 
-            if result.get("status"):
+            if result["status"]:
                 Utils.format_text(
-                    f"{plugin.get('name')} was installed successfully",
+                    f"{plugin['name']} was installed successfully",
                     Color.SUCCESS,
                 )
             else:
@@ -92,13 +93,13 @@ class Main:
 
             result: StatusDict = self.api.download_plugin_if_update(filename)
 
-            if result.get("status"):
+            if result["status"]:
                 update_count += 1
                 color = Color.SUCCESS
             else:
                 color = Color.WARNING
 
-            if message := result.get("message"):
+            if message := result["message"]:
                 Utils.format_text(message, color)
 
         Utils.separator()
@@ -108,7 +109,7 @@ class Main:
         )
 
     @staticmethod
-    def parse_args() -> argparse.Namespace:
+    def parse_args() -> Namespace:
         """
         :return: an argparse.Namespace instance for the program's arguments
         """
@@ -142,11 +143,11 @@ class Main:
         return parser.parse_args()
 
     @staticmethod
-    def get_plugin_choice(plugin_list: list) -> Union[dict, None]:
+    def get_plugin_choice(plugin_list: list[Plugin]) -> Union[Plugin, None]:
         Utils.separator()
         for index, plugin in enumerate(plugin_list):
             Utils.format_text(
-                f"{index} | {plugin.get('name')} by {plugin.get('author').get('name')} | {plugin.get('tag')}",
+                f"{index} | {plugin['name']} by {plugin['author']['name']} | {plugin['tag']}",
                 Color.STATUS,
             )
 

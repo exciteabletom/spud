@@ -38,7 +38,7 @@ class SpigetAPI:
         response = self.call_api(f"/resources/{plugin_id}")
         return response.json()
 
-    def search_plugins(self, search_name: str) -> Union[list, None]:
+    def search_plugins(self, search_name: str) -> Union[list[Plugin], None]:
         names = [search_name]
         split_name: str = Utils.split_title_case(search_name)
         if split_name:
@@ -104,7 +104,7 @@ class SpigetAPI:
         :return: StatusDict
         """
         response = self.call_api(
-            f"/resources/{plugin.get('id')}/download",
+            f"/resources/{plugin['id']}/download",
         )
 
         if not filename:
@@ -145,7 +145,7 @@ class SpigetAPI:
             self.download_plugin(plugin, filename)
             return {
                 "status": True,
-                "message": f"Updated {plugin.get('name')} to latest version",
+                "message": f"Updated {plugin['name']} to latest version",
             }
 
     def get_author(self, author_id: int) -> Author:
