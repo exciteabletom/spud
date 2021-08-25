@@ -4,8 +4,6 @@
 A cross-platform, [Spigot](https://www.spigotmc.org/) plugin manager that adheres to the
 [Unix philosophy](https://en.wikipedia.org/wiki/Unix_philosophy) and Python best practices.
 
-Work in progress.
-
 ## Installation
 Python 3.8 or later is required
 
