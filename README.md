@@ -34,4 +34,3 @@ Spud tries its best to extract the plugin name, but it will fail if there is cop
 
 ## Acknowledgements
 Inspired by [pluGET](https://github.com/Neocky/pluGET)
-
