@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import re
 import string
@@ -97,9 +99,9 @@ class Utils:
         sep_char = "="
         print(Fore.WHITE + (sep_char * 15) + Fore.RESET)
 
-    # noinspection PyBroadException
     @classmethod
     def inject_metadata_file(cls, plugin: Plugin, filename: str) -> None:
+        # noinspection PyBroadException
         try:
             metadata: Metadata = {
                 "search_name": plugin["name"],
