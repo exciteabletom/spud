@@ -28,5 +28,6 @@ repos:
     - id: unit-tests
       name: Unit tests
       language: system
+      files: ".py$"
       entry: python3 -m unittest discover tests
       pass_filenames: false
