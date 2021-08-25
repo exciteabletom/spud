@@ -33,7 +33,7 @@ class Main:
 
     def install(self, plugins: Collection[str]) -> None:
         """
-        Download the jars for a list of plugins and save it as a file.
+        Download the jars for a list of plugins and save them as files.
 
         :param plugins: A list of plugin names or jar filenames
         """
