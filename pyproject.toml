@@ -6,4 +6,5 @@ requires = [
     "colorama",
     "pyyaml",
     "emoji",
+	"beautifulsoup4"
 ]
