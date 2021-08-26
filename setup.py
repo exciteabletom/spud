@@ -5,6 +5,11 @@ from spud import settings
 with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
+requirements = []
+with open("requirements.txt", "r") as fh:
+    for line in fh:
+        requirements.append(line.strip())
+
 setuptools.setup(
     name="spud-mc",
     version=settings.VERSION,
@@ -23,5 +28,6 @@ setuptools.setup(
     },
     package_dir={"spud": "spud"},
     packages=["spud"],
+    install_requires=requirements,
     python_requires=">=3.8",
 )
