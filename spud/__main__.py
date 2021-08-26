@@ -94,8 +94,9 @@ class Main:
             metadata: Union[Metadata, None] = Utils.load_metadata_file(filename)
 
             if not metadata:
-                print(
-                    f"Couldn't load metadata for {filename}. Try reinstalling with spud first"
+                Utils.format_text(
+                    f"Couldn't load metadata for {filename}. Try reinstalling with spud first",
+                    Color.DIMMED,
                 )
                 break
 

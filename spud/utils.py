@@ -20,6 +20,7 @@ from .type import Plugin, Metadata
 @unique
 class Color(Enum):
     STATUS = Fore.LIGHTWHITE_EX
+    DIMMED = Fore.WHITE
     SUCCESS = Fore.GREEN
     WARNING = Fore.YELLOW
     ERROR = Fore.RED
