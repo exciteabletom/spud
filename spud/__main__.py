@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-import argparse
-from argparse import Namespace
+from argparse import ArgumentParser, Namespace
 import os
 from pathlib import Path
 from typing import Collection, Union
@@ -12,9 +11,7 @@ from .type import StatusDict, Plugin, Metadata, Update
 
 
 class Main:
-    """
-    Class for handling program arguments and providing a user interface for the API backend
-    """
+    """Class for handling program arguments and providing a user interface for the API backend"""
 
     def __init__(self, api_class=api.SpigetAPI) -> None:
         """Initialise the cli application"""
@@ -147,9 +144,9 @@ class Main:
     @staticmethod
     def parse_args() -> Namespace:
         """
-        :return: an argparse.Namespace instance for the program's arguments
+        :return: a Namespace instance for the program's arguments
         """
-        parser = argparse.ArgumentParser(
+        parser = ArgumentParser(
             description="Spud: The plugin manager for your Spigot Minecraft server",
             epilog="Licensed under GPLv3 (https://www.gnu.org/licenses/gpl-3.0.en.html)",
         )
