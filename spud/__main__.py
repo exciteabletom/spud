@@ -97,6 +97,7 @@ class Main:
                 print(
                     f"Couldn't load metadata for {filename}. Try reinstalling with spud first"
                 )
+                break
 
             plugin: Union[Plugin, None] = self.api.check_update(metadata)
 
