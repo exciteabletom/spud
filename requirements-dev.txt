@@ -5,3 +5,4 @@ mypy
 types-requests
 types-emoji
 types-colorama
+types-beautifulsoup4

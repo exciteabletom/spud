@@ -8,7 +8,7 @@ from typing import Collection, Union
 
 from . import api
 from .utils import Utils, Color
-from .type import StatusDict, Plugin
+from .type import StatusDict, Plugin, Metadata, Update
 
 
 class Main:
@@ -91,7 +91,41 @@ class Main:
             if ".jar" not in filename:
                 filename = Utils.create_jar_name(plugin_name)
 
-            result: StatusDict = self.api.download_plugin_if_update(filename)
+            metadata: Union[Metadata, None] = Utils.load_metadata_file(filename)
+
+            if not metadata:
+                print(
+                    f"Couldn't load metadata for {filename}. Try reinstalling with spud first"
+                )
+
+            plugin: Union[Plugin, None] = self.api.check_update(metadata)
+
+            result: StatusDict = {"status": False, "message": ""}
+            if plugin:
+                if self.args.noninteractive:
+                    result = self.api.download_plugin(plugin)
+                else:
+                    update: Update = self.api.get_latest_update_info(plugin)
+                    if update:
+                        changelog = update["description"]
+                        Utils.separator()
+                        Utils.format_text(
+                            f"Changelog for {plugin['name']}:", Color.STATUS
+                        )
+                        Utils.format_text(changelog, Color.STATUS)
+                        Utils.separator()
+                    else:
+                        Utils.format_text(
+                            "Error retrieving update information!", Color.ERROR
+                        )
+
+                    if Utils.prompt_bool(f"Would you like to update {plugin['name']}?"):
+                        result = self.api.download_plugin(plugin)
+                    else:
+                        result = {
+                            "status": False,
+                            "message": f"Not updating {plugin['name']}",
+                        }
 
             if result["status"]:
                 update_count += 1

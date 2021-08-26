@@ -1,13 +1,17 @@
 from __future__ import annotations
 
+import base64
 import itertools
 import operator
+
+from bs4 import BeautifulSoup
 from typing import Union
 
 import requests
+from requests import HTTPError
 
 from . import settings
-from .type import Plugin, StatusDict, Author, Metadata
+from .type import Plugin, StatusDict, Author, Metadata, Update
 from .utils import Utils
 
 
@@ -28,11 +32,15 @@ class SpigetAPI:
 
     # noinspection PyDefaultArgument
     def call_api(self, api_request: str, params: dict = {}) -> requests.Response:
-        return requests.get(
+        response = requests.get(
             self.build_api_url(api_request),
             params=params,
             headers=self.headers,
         )
+        if str(response.status_code).startswith("5"):
+            raise HTTPError
+
+        return response
 
     def get_plugin_by_id(self, plugin_id: int) -> Plugin:
         response = self.call_api(f"/resources/{plugin_id}")
@@ -99,7 +107,7 @@ class SpigetAPI:
         """
         Download a plugin
 
-        :param plugin: Dict containing plugin name, tag, and ID
+        :param plugin: Plugin dict
         :param filename: Force a specific filename for the plugin instead of automatically making one
         :return: StatusDict
         """
@@ -120,19 +128,7 @@ class SpigetAPI:
 
         return {"status": True, "message": ""}
 
-    def download_plugin_if_update(self, filename: str) -> StatusDict:
-        """
-
-        :param filename: Filename of a plugin
-        :return: StatusDict
-        """
-        metadata: Union[Metadata, None] = Utils.load_metadata_file(filename)
-        if not metadata:
-            return {
-                "status": False,
-                "message": f"Couldn't load metadata for {filename}. Try reinstalling with spud first",
-            }
-
+    def check_update(self, metadata: Metadata) -> Union[Plugin, None]:
         plugin_id: int = metadata["plugin_id"]
         plugin = self.get_plugin_by_id(plugin_id)
 
@@ -140,13 +136,9 @@ class SpigetAPI:
         latest_version: int = plugin["version"]["id"]
 
         if local_version >= latest_version:
-            return {"status": False, "message": ""}
+            return None
         else:
-            self.download_plugin(plugin, filename)
-            return {
-                "status": True,
-                "message": f"Updated {plugin['name']} to latest version",
-            }
+            return plugin
 
     def get_author(self, author_id: int) -> Author:
         """
@@ -156,3 +148,27 @@ class SpigetAPI:
         :return: A dict representing the author
         """
         return self.call_api(f"/authors/{author_id}").json()
+
+    def get_latest_update_info(self, plugin: Plugin) -> Union[Update, None]:
+        response = self.call_api(f"/resources/{plugin['id']}/updates/latest")
+
+        if response.status_code == 200:
+            update: Update = response.json()
+            # Decode base64
+            update["description"] = bytes.decode(
+                (base64.b64decode(update["description"]))
+            )
+            # Convert html to plaintext
+            update["description"] = " ".join(
+                BeautifulSoup(update["description"], "html.parser").stripped_strings
+            )
+            # Remove duplicate newlines and spaces
+            update["description"] = update["description"].replace("  ", " ")
+            update["description"] = update["description"].replace("\r\n", "\n")
+            update["description"] = update["description"].replace("\n\n", "\n")
+
+            if len(update["description"]) > 1500:
+                update["description"] = update["description"][:1500] + "..."
+            return update
+        else:
+            return None

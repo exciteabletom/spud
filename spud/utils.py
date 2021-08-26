@@ -6,6 +6,7 @@ import string
 import sys
 from enum import Enum, unique
 from typing import Union
+import base64
 import zipfile
 
 import emoji
@@ -88,11 +89,26 @@ class Utils:
             return formatted_text
 
     @classmethod
-    def prompt(cls, text) -> str:
+    def prompt(cls, text: str) -> str:
         try:
             return input(cls.format_text(text + ": ", Color.STATUS, print_text=False))
         except KeyboardInterrupt:
             sys.exit(1)
+
+    @classmethod
+    def prompt_bool(cls, question: str) -> bool:
+        while True:
+            try:
+                answer = cls.prompt(question + " (y/n)").lower()
+            except EOFError:
+                return False
+
+            if answer == "y":
+                return True
+            elif answer == "n":
+                return False
+            else:
+                Utils.format_text("Answer must be 'y' or 'n'", Color.ERROR)
 
     @staticmethod
     def separator() -> None:
