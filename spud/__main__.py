@@ -95,9 +95,9 @@ class Main:
                     f"Couldn't load metadata for {filename}. Try reinstalling with spud first",
                     Color.DIMMED,
                 )
-                break
+                continue
 
-            plugin: Union[Plugin, None] = self.api.check_update(metadata)
+            plugin: Union[Plugin, None] = self.api.get_latest_plugin(metadata)
 
             result: StatusDict = {"status": False, "message": ""}
             if plugin:

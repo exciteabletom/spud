@@ -128,7 +128,7 @@ class SpigetAPI:
 
         return {"status": True, "message": ""}
 
-    def check_update(self, metadata: Metadata) -> Union[Plugin, None]:
+    def get_latest_plugin(self, metadata: Metadata) -> Union[Plugin, None]:
         plugin_id: int = metadata["plugin_id"]
         plugin = self.get_plugin_by_id(plugin_id)
 
