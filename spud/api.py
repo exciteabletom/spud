@@ -1,11 +1,17 @@
+"""
+Classes for interacting with APIs.
+
+classes:
+    SpigetAPI - Helps interacting with the Spiget API
+"""
 from __future__ import annotations
 
 import base64
 import itertools
 import operator
+from typing import Union
 
 from bs4 import BeautifulSoup
-from typing import Union
 
 import requests
 from requests import HTTPError
@@ -16,24 +22,44 @@ from .utils import Utils
 
 
 class SpigetAPI:
+    """
+    A class to represent a connection with the Spiget API
+    """
+
     def __init__(
         self,
-        base_api_url=settings.BASE_API_URL,
-        user_agent=settings.USER_AGENT,
-    ):
+        base_api_url: str = settings.BASE_API_URL,
+        user_agent: str = settings.USER_AGENT,
+    ) -> None:
+        """
+        Initialise an instance of the Spiget API
+
+        :param base_api_url: The root API http URL, default: settings.BASE_API_URL
+        :param user_agent: The user-agent header to send with requests, default: settings.USER_AGENT
+        """
         self.base_api_url = base_api_url
 
         self.headers: dict = {
             "user-agent": user_agent,
         }
 
-    def build_api_url(self, api_request: str) -> str:
-        return f"{self.base_api_url}{api_request}"
+    def build_api_url(self, endpoint: str) -> str:
+        """Append an endpoint to the base API url and return it"""
+        return f"{self.base_api_url}{endpoint}"
 
-    # noinspection PyDefaultArgument
-    def call_api(self, api_request: str, params: dict = {}) -> requests.Response:
+    def call_api(self, endpoint: str, params=None) -> requests.Response:
+        """
+        Call an API endpoint
+
+        :param endpoint: The endpoint to call
+        :param params: POST request body (optional)
+        :returns: A Response object
+        """
+        if params is None:
+            params = {}
+
         response = requests.get(
-            self.build_api_url(api_request),
+            self.build_api_url(endpoint),
             params=params,
             headers=self.headers,
         )
@@ -43,12 +69,22 @@ class SpigetAPI:
         return response
 
     def get_plugin_by_id(self, plugin_id: int) -> Plugin:
+        """
+        Get a Plugin using an ID.
+
+        :returns: A dict of type Plugin
+        """
         response = self.call_api(f"/resources/{plugin_id}")
         return response.json()
 
-    def search_plugins(self, search_name: str) -> Union[list[Plugin], None]:
-        names = [search_name]
-        split_name: str = Utils.split_title_case(search_name)
+    def search_plugins(self, query: str) -> list[Plugin]:
+        """
+        Search for plugins using a query
+
+        :returns: A list of Plugin dicts, sorted by relevance to the query
+        """
+        names = [query]
+        split_name: str = Utils.split_title_case(query)
         if split_name:
             names.append(split_name)
 
@@ -69,7 +105,7 @@ class SpigetAPI:
                 plugin_list.append(plugin)
 
         if len(plugin_list) == 0:
-            return None
+            return []
 
         # Sort the list by highest downloads, then IDs
         plugin_list.sort(key=operator.itemgetter("downloads", "id"), reverse=True)
@@ -78,13 +114,13 @@ class SpigetAPI:
         plugin_list = [id_field[0] for id_field in itertools.groupby(plugin_list)]
 
         sorted_list: list[Plugin] = []
-        for index, plugin in enumerate(plugin_list):
+        for plugin in plugin_list:
             # Exact match goes to first index
-            if search_name.upper() == plugin["name"].upper():
+            if query.upper() == plugin["name"].upper():
                 sorted_list.insert(0, plugin)
 
             # Fuzzy match goes to second index
-            elif search_name.upper() in plugin["name"].upper():
+            elif query.upper() in plugin["name"].upper():
                 sorted_list.insert(1, plugin)
 
             # Everything else just gets appended to the end
@@ -108,7 +144,7 @@ class SpigetAPI:
         Download a plugin
 
         :param plugin: Plugin dict
-        :param filename: Force a specific filename for the plugin instead of automatically making one
+        :param filename: Force a filename for the plugin instead of inferring it
         :return: StatusDict
         """
         response = self.call_api(
@@ -120,15 +156,20 @@ class SpigetAPI:
         else:
             plugin_jar_name = filename
 
-        with open(plugin_jar_name, "wb") as f:
-            f.write(response.content)
-            pass
+        with open(plugin_jar_name, "wb") as file:
+            file.write(response.content)
 
         Utils.inject_metadata_file(plugin, plugin_jar_name)
 
         return {"status": True, "message": ""}
 
-    def get_latest_plugin(self, metadata: Metadata) -> Union[Plugin, None]:
+    def get_plugin_info_if_update(self, metadata: Metadata) -> Union[Plugin, None]:
+        """
+        Get a Plugin dict for a plugin if it has been updated.
+
+        :param metadata: A Metadata dict
+        :returns: A Plugin dict if there was an update, otherwise None
+        """
         plugin_id: int = metadata["plugin_id"]
         plugin = self.get_plugin_by_id(plugin_id)
 
@@ -137,8 +178,8 @@ class SpigetAPI:
 
         if local_version >= latest_version:
             return None
-        else:
-            return plugin
+
+        return plugin
 
     def get_author(self, author_id: int) -> Author:
         """
@@ -149,26 +190,28 @@ class SpigetAPI:
         """
         return self.call_api(f"/authors/{author_id}").json()
 
-    def get_latest_update_info(self, plugin: Plugin) -> Union[Update, None]:
+    def get_latest_update_info(self, plugin: Plugin) -> Update:
+        """
+        Get information about the latest update of a plugin
+
+        :param plugin: A Plugin dict
+        :returns: An Update dict
+        """
         response = self.call_api(f"/resources/{plugin['id']}/updates/latest")
+        response.raise_for_status()
 
-        if response.status_code == 200:
-            update: Update = response.json()
-            # Decode base64
-            update["description"] = bytes.decode(
-                (base64.b64decode(update["description"]))
-            )
-            # Convert html to plaintext
-            update["description"] = " ".join(
-                BeautifulSoup(update["description"], "html.parser").stripped_strings
-            )
-            # Remove duplicate newlines and spaces
-            update["description"] = update["description"].replace("  ", " ")
-            update["description"] = update["description"].replace("\r\n", "\n")
-            update["description"] = update["description"].replace("\n\n", "\n")
+        update: Update = response.json()
+        # Decode base64
+        update["description"] = bytes.decode((base64.b64decode(update["description"])))
+        # Convert html to plaintext
+        update["description"] = " ".join(
+            BeautifulSoup(update["description"], "html.parser").stripped_strings
+        )
+        # Remove duplicate newlines and spaces
+        update["description"] = update["description"].replace("  ", " ")
+        update["description"] = update["description"].replace("\r\n", "\n")
+        update["description"] = update["description"].replace("\n\n", "\n")
 
-            if len(update["description"]) > 1500:
-                update["description"] = update["description"][:1500] + "..."
-            return update
-        else:
-            return None
+        if len(update["description"]) > 1500:
+            update["description"] = update["description"][:1500] + "..."
+        return update

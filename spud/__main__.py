@@ -1,3 +1,12 @@
+"""
+Main module for running the CLI abstraction to the API backend
+
+classes:
+    Main - Represents a CLI
+
+Functions:
+    init - Initialises a new CLI instance
+"""
 from __future__ import annotations
 
 from argparse import ArgumentParser, Namespace
@@ -67,7 +76,6 @@ class Main:
                 )
             else:
                 Utils.format_text(result["message"], Color.WARNING)
-        pass
 
     def update(self, plugins: Collection[str]) -> None:
         """
@@ -97,7 +105,7 @@ class Main:
                 )
                 continue
 
-            plugin: Union[Plugin, None] = self.api.get_latest_plugin(metadata)
+            plugin: Union[Plugin, None] = self.api.get_plugin_info_if_update(metadata)
 
             result: StatusDict = {"status": False, "message": ""}
             if plugin:
@@ -105,18 +113,11 @@ class Main:
                     result = self.api.download_plugin(plugin)
                 else:
                     update: Update = self.api.get_latest_update_info(plugin)
-                    if update:
-                        changelog = update["description"]
-                        Utils.separator()
-                        Utils.format_text(
-                            f"Changelog for {plugin['name']}:", Color.STATUS
-                        )
-                        Utils.format_text(changelog, Color.STATUS)
-                        Utils.separator()
-                    else:
-                        Utils.format_text(
-                            "Error retrieving update information!", Color.ERROR
-                        )
+                    changelog = update["description"]
+                    Utils.separator()
+                    Utils.format_text(f"Changelog for {plugin['name']}:", Color.STATUS)
+                    Utils.format_text(changelog, Color.STATUS)
+                    Utils.separator()
 
                     if Utils.prompt_bool(f"Would you like to update {plugin['name']}?"):
                         result = self.api.download_plugin(plugin)
@@ -126,11 +127,10 @@ class Main:
                             "message": f"Not updating {plugin['name']}",
                         }
 
+            color = Color.WARNING
             if result["status"]:
                 update_count += 1
                 color = Color.SUCCESS
-            else:
-                color = Color.WARNING
 
             if message := result["message"]:
                 Utils.format_text(message, color)
@@ -177,6 +177,11 @@ class Main:
 
     @staticmethod
     def get_plugin_choice(plugin_list: list[Plugin]) -> Union[Plugin, None]:
+        """
+        Gets a user's choice out of a list of plugins
+
+        :returns: The Plugin dict the user chose, or None if they didn't choose one
+        """
         Utils.separator()
         for index, plugin in enumerate(plugin_list):
             Utils.format_text(
@@ -198,8 +203,8 @@ class Main:
 
             if 0 <= chosen_id < len(plugin_list):
                 return plugin_list[chosen_id]
-            else:
-                continue
+
+            continue
 
 
 def init():

@@ -1,3 +1,10 @@
+"""
+Miscellaneous utilities
+
+Classes:
+    Color - An Enum of ansi colors
+    Utils - General utilities
+"""
 from __future__ import annotations
 
 import json
@@ -5,8 +12,7 @@ import re
 import string
 import sys
 from enum import Enum, unique
-from typing import Union
-import base64
+from typing import Union, get_type_hints
 import zipfile
 
 import emoji
@@ -19,6 +25,8 @@ from .type import Plugin, Metadata
 
 @unique
 class Color(Enum):
+    """Enum of several ANSI colors labelled by use case"""
+
     STATUS = Fore.LIGHTWHITE_EX
     DIMMED = Fore.WHITE
     SUCCESS = Fore.GREEN
@@ -26,7 +34,13 @@ class Color(Enum):
     ERROR = Fore.RED
 
 
+# Static class
 class Utils:
+    """
+    A static class of methods which perform basic, general tasks.
+    This class shouldn't be initialised before use.
+    """
+
     init_colorama()
 
     @staticmethod
@@ -70,34 +84,47 @@ class Utils:
 
     @staticmethod
     def create_jar_name(text: str) -> str:
+        """Remove whitespace and append '.jar'"""
         return text.translate(str.maketrans("", "", string.whitespace)) + ".jar"
 
     @staticmethod
     def get_plugin_name_from_jar(jar_name: str) -> str:
+        """Remove '.jar' from the end of the string"""
         if jar_name.endswith(".jar"):
             return jar_name.replace(".jar", "")
         return jar_name
 
     @staticmethod
     def format_text(text: str, ansi_color: Color, print_text=True) -> Union[str, None]:
+        """
+        Format text with a color
+
+        :param text: The text to print
+        :param ansi_color: The Ansi color to use
+        :param print_text: Whether to print the text or return it, default: True
+        """
         str_color: str = str(ansi_color.value)
 
         formatted_text = str_color + text + Fore.RESET
         if print_text:
             print(formatted_text)
             return None
-        else:
-            return formatted_text
+
+        return formatted_text
 
     @classmethod
-    def prompt(cls, text: str) -> str:
+    def prompt(cls, question: str) -> str:
+        """Prompt the user for an arbitrary string input."""
         try:
-            return input(cls.format_text(text + ": ", Color.STATUS, print_text=False))
+            return input(
+                cls.format_text(question + ": ", Color.STATUS, print_text=False)
+            )
         except KeyboardInterrupt:
             sys.exit(1)
 
     @classmethod
     def prompt_bool(cls, question: str) -> bool:
+        """Ask the user a yes/no question and return a boolean"""
         while True:
             try:
                 answer = cls.prompt(question + " (y/n)").lower()
@@ -106,37 +133,39 @@ class Utils:
 
             if answer == "y":
                 return True
-            elif answer == "n":
+            if answer == "n":
                 return False
-            else:
-                Utils.format_text("Answer must be 'y' or 'n'", Color.ERROR)
+
+            Utils.format_text("Answer must be 'y' or 'n'", Color.ERROR)
 
     @staticmethod
     def separator() -> None:
+        """Print 15 '='"""
         sep_char = "="
         print(Fore.WHITE + (sep_char * 15) + Fore.RESET)
 
     @classmethod
     def inject_metadata_file(cls, plugin: Plugin, filename: str) -> None:
-        # noinspection PyBroadException
-        try:
-            metadata: Metadata = {
-                "search_name": plugin["name"],
-                "plugin_id": plugin["id"],
-                "plugin_version_id": plugin["version"]["id"],
-            }
+        """Insert a Plugin's metadata into a filename"""
+        metadata: Metadata = {
+            "search_name": plugin["name"],
+            "plugin_id": plugin["id"],
+            "plugin_version_id": plugin["version"]["id"],
+        }
 
-            metadata_json = json.dumps(metadata).encode("UTF-8")
+        metadata_json = json.dumps(metadata).encode("UTF-8")
 
-            with zipfile.ZipFile(filename, "a") as jar:
-                jar.writestr(settings.METADATA_FILENAME, metadata_json)
-        except:
-            cls.format_text(
-                "Could not write metadata file due to an unknown error", Color.ERROR
-            )
+        with zipfile.ZipFile(filename, "a") as jar:
+            jar.writestr(settings.METADATA_FILENAME, metadata_json)
 
     @staticmethod
     def load_metadata_file(filename: str) -> Union[Metadata, None]:
+        """
+        Load a metadata file from a Plugin jar
+
+        :param filename: The filename to get the metadata from
+        :returns: Metadata dict, or None if the file was invalid
+        """
         try:
             with zipfile.ZipFile(filename) as jar:
                 metadata_str: str = jar.read(settings.METADATA_FILENAME).decode("UTF-8")
@@ -145,8 +174,8 @@ class Utils:
 
                 # Validate that the keys in the metadata are of the correct type
                 # to satisfy the type checker
-                for key, value in Metadata.__annotations__.items():
-                    if not type(tmp_metadata[key]) == value:
+                for key, value in get_type_hints(Metadata).items():
+                    if not isinstance(tmp_metadata[key], value):
                         raise TypeError
 
                 metadata: Metadata = {
@@ -162,4 +191,5 @@ class Utils:
 
     @staticmethod
     def split_title_case(text: str) -> str:
+        """Split a title case word up with spaces. E.g. 'FooBar' -> 'Foo Bar'"""
         return " ".join(re.findall(r"[A-Z](?:[a-z]+|[A-Z]*(?=[A-Z]|$))", text))
