@@ -1,5 +1,6 @@
 import os
 import unittest
+from pathlib import Path
 
 from spud import api
 
@@ -22,12 +23,19 @@ class TestAPI(unittest.TestCase):
 
     def test_search_plugins(self):
         res = self.spiget.search_plugins("LuckPerms")
-        self.assertTrue(type(res) == list and type(res[0]) == dict)
+        # returns list
+        self.assertTrue(type(res) == list)
+        # of dicts
+        self.assertTrue(type(res[0]) == dict)
+        # that are not empty
+        self.assertTrue(type(res[0]))
 
     def test_download_plugin(self):
         plugin = self.spiget.search_plugins("LuckPerms")[0]
         result = self.spiget.download_plugin(plugin)
         self.assertTrue(result.get("status"))
+        self.assertTrue("LuckPerms.jar" in os.listdir())
+        self.assertTrue(Path("LuckPerms.jar").stat().st_size > 100000)
 
 
 if __name__ == "__main__":
