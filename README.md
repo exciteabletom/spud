@@ -30,5 +30,8 @@ Spud tries its best to extract the plugin name, but it will fail if there is cop
 
 - Spud can't install resources not listed on https://spigotmc.org
 
+
+- Spud can't install premium resources
+
 ## Acknowledgements
 Inspired by [pluGET](https://github.com/Neocky/pluGET)
