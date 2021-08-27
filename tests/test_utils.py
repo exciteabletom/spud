@@ -1,6 +1,5 @@
 import unittest
 
-from spud.type import StatusDict
 from spud.utils import Utils
 
 
@@ -19,6 +18,7 @@ class MyTestCase(unittest.TestCase):
         tag = "1.17 supported | unit tests!"
         final_tag = "1.17 supported - unit tests!"
 
+        # noinspection PyTypeChecker
         result = Utils.sanitise_api_plugin(
             {
                 "name": name,
