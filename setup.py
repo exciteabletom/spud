@@ -22,6 +22,12 @@ setuptools.setup(
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: System Administrators",
+        "Natural Language :: English",
+        "Operating System :: OS Independent",
+        "Topic :: System :: Software Distribution",
+        "Typing :: Typed",
     ],
     entry_points={
         "console_scripts": ["spud = spud.__main__:init"],
