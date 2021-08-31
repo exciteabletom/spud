@@ -28,7 +28,7 @@ repos:
     - id: pylint
       name: pylint
       language: system
-      entry: pylint spud/
+      entry: pylint -j4 spud/
       pass_filenames: false
 
     - id: unit-tests
