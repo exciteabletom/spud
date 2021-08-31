@@ -4,6 +4,17 @@
 A cross-platform, [Spigot](https://www.spigotmc.org/) plugin manager that adheres to the
 [Unix philosophy](https://en.wikipedia.org/wiki/Unix_philosophy) and Python best practices.
 
+Some focuses of the project are:
+
+1. Easy and simple commands (updating all your plugins is as simple as `spud update`)
+
+1. Unlike other options like [pluGET](https://github.com/Neocky/pluGET), it adheres to Unix conventions and doesn't force you to use a GUI, making it easy to use in scripts.
+
+1. Insisting upon readability, static type hinting, test-driven development, and consistent styling in the codebase.
+
+1. Descriptive output and actionable error messages
+
+
 ## Installation
 Python 3.8 or later is required
 
@@ -14,10 +25,14 @@ Run `spud -h` to see all the options.
 
 ## Example usages
 - Install a plugin: `spud install PluginName`
+
 - Install a plugin without prompting for input: `spud -n install PluginName`
+
 - Update all plugins in the working directory: `spud update`
+
 - Update all plugins in `~/server/plugins`: `spud -d ~/server/plugins update`
-- Update plugin `myplugin.jar`: `spud update myplugin.jar` or `spud update myplugin`
+ 
+- Update plugin `myplugin.jar`: `spud update myplugin.jar`
 
 ## Known Issues
 - Some resources have lots of filler in the title. e.g. `[1.8-1.17] · PluginName |
@@ -32,6 +47,3 @@ Spud tries its best to extract the plugin name, but it will fail if there is cop
 
 
 - Spud can't install premium resources
-
-## Acknowledgements
-Inspired by [pluGET](https://github.com/Neocky/pluGET)
