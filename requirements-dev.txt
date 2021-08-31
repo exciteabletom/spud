@@ -2,6 +2,7 @@ wheel
 pre-commit
 black
 mypy
+pylint
 types-requests
 types-emoji
 types-colorama

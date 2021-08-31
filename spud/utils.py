@@ -15,9 +15,8 @@ from enum import Enum, unique
 from typing import Union, get_type_hints
 import zipfile
 
-import colorama
 import emoji
-from colorama import Fore, Style, Back
+from colorama import Fore, Style
 from colorama import init as init_colorama
 
 from . import settings
