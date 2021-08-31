@@ -15,8 +15,9 @@ from enum import Enum, unique
 from typing import Union, get_type_hints
 import zipfile
 
+import colorama
 import emoji
-from colorama import Fore
+from colorama import Fore, Style, Back
 from colorama import init as init_colorama
 
 from . import settings
@@ -27,8 +28,8 @@ from .type import Plugin, Metadata
 class Color(Enum):
     """Enum of several ANSI colors labelled by use case"""
 
-    STATUS = Fore.LIGHTWHITE_EX
-    DIMMED = Fore.WHITE
+    STATUS = Style.BRIGHT + Fore.WHITE
+    DIMMED = Style.NORMAL + Fore.WHITE
     SUCCESS = Fore.GREEN
     WARNING = Fore.YELLOW
     ERROR = Fore.RED
@@ -105,7 +106,7 @@ class Utils:
         """
         str_color: str = str(ansi_color.value)
 
-        formatted_text = str_color + text + Fore.RESET
+        formatted_text = str_color + text + Style.RESET_ALL
         if print_text:
             print(formatted_text)
             return None
@@ -117,7 +118,7 @@ class Utils:
         """Prompt the user for an arbitrary string input."""
         try:
             return input(
-                cls.format_text(question + ": ", Color.STATUS, print_text=False)
+                cls.format_text(question + ": ", Color.WARNING, print_text=False)
             )
         except KeyboardInterrupt:
             sys.exit(1)
@@ -140,9 +141,9 @@ class Utils:
 
     @staticmethod
     def separator() -> None:
-        """Print 15 '='"""
-        sep_char = "="
-        print(Fore.WHITE + (sep_char * 15) + Fore.RESET)
+        """Print 20 * '-'"""
+        sep_char = "-"
+        Utils.format_text(sep_char * 20, Color.DIMMED)
 
     @classmethod
     def inject_metadata_file(cls, plugin: Plugin, filename: str) -> None:

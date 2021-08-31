@@ -62,7 +62,7 @@ class Main:
                 plugin = self.get_plugin_choice(plugin_list)
 
             if not plugin:
-                Utils.format_text("Skipping!", Color.WARNING)
+                Utils.format_text("Skipping Install!", Color.ERROR)
                 continue
 
             Utils.format_text(f"Installing {plugin['name']}", Color.STATUS)
@@ -101,7 +101,7 @@ class Main:
             if not metadata:
                 Utils.format_text(
                     f"Couldn't load metadata for {filename}. Try reinstalling with spud first",
-                    Color.DIMMED,
+                    Color.WARNING,
                 )
                 continue
 
@@ -190,7 +190,6 @@ class Main:
             )
 
         Utils.separator()
-
         while True:
             try:
                 chosen_id: int = int(
