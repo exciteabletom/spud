@@ -27,6 +27,7 @@ repos:
     hooks:
     - id: pylint
       name: pylint
+      files: ".py$"
       language: system
       entry: pylint -j4 spud/
       pass_filenames: false
