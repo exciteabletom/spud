@@ -2,7 +2,7 @@
 Main module for running the CLI abstraction to the API backend
 
 classes:
-    Main - Represents a CLI
+    Main - Represents a CLI interface
 
 Functions:
     init - Initialises a new CLI instance
@@ -17,6 +17,7 @@ from typing import Collection, Union
 from . import api
 from .utils import Utils, Color
 from .type import StatusDict, Plugin, Metadata, Update
+from .settings import VERSION
 
 
 class Main:
@@ -148,7 +149,8 @@ class Main:
         """
         parser = ArgumentParser(
             description="Spud: The plugin manager for your Spigot Minecraft server",
-            epilog="Licensed under GPLv3 (https://www.gnu.org/licenses/gpl-3.0.en.html)",
+            epilog="Licensed under GPLv3 (https://www.gnu.org/licenses/gpl-3.0.en.html). "
+            "Source available at https://github.com/exciteabletom/spud",
         )
         parser.add_argument("action", help="install or update", type=str)
         parser.add_argument(
@@ -172,6 +174,9 @@ class Main:
             help="path to plugins directory, defaults to the working directory",
             type=Path,
             default=".",
+        )
+        parser.add_argument(
+            "-v", "--version", action="version", version=f"%(prog)s {VERSION}"
         )
         return parser.parse_args()
 
