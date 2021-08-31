@@ -2,5 +2,4 @@ requests
 colorama
 PyYAML
 emoji
-setuptools
 beautifulsoup4
