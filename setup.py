@@ -9,7 +9,7 @@ with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
 requirements = []
-with open("requirements.txt", "r", encoding="UTF-8") as fh:
+with open("requirements.txt", "r", encoding="utf-8") as fh:
     for line in fh:
         requirements.append(line.strip())
 
