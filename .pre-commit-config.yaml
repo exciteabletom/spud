@@ -29,7 +29,7 @@ repos:
       name: pylint
       files: ".py$"
       language: system
-      entry: pylint -j4
+      entry: pylint -j4 --max-line-length=140
       pass_filenames: true
 
     - id: unit-tests
