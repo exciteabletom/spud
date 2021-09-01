@@ -1,3 +1,4 @@
+# pylint: disable=missing-module-docstring, missing-class-docstring, missing-function-docstring
 import os
 import unittest
 from pathlib import Path
@@ -24,11 +25,11 @@ class TestAPI(unittest.TestCase):
     def test_search_plugins(self):
         res = self.spiget.search_plugins("LuckPerms")
         # returns list
-        self.assertTrue(type(res) == list)
+        self.assertTrue(isinstance(res, list))
         # of dicts
-        self.assertTrue(type(res[0]) == dict)
+        self.assertTrue(isinstance(res[0], dict))
         # that are not empty
-        self.assertTrue(type(res[0]))
+        self.assertTrue(res[0])
 
     def test_download_plugin(self):
         plugin = self.spiget.search_plugins("LuckPerms")[0]
