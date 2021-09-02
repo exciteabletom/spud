@@ -150,6 +150,12 @@ class SpigetAPI:
         response = self.call_api(
             f"/resources/{plugin['id']}/download",
         )
+        if response.status_code != 200:
+            return {
+                "status": False,
+                "message": "Could not download resource due to an unknown error. "
+                           "This can sometimes happen with external resources.",
+            }
 
         if not filename:
             plugin_jar_name = Utils.create_jar_name(plugin["name"])

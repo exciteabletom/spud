@@ -107,26 +107,27 @@ class Main:
                 continue
 
             plugin: Union[Plugin, None] = self.api.get_plugin_info_if_update(metadata)
+            if plugin is None:
+                continue
 
-            result: StatusDict = {"status": False, "message": ""}
-            if plugin:
-                if self.args.noninteractive:
-                    result = self.api.download_plugin(plugin)
-                else:
-                    update: Update = self.api.get_latest_update_info(plugin)
-                    changelog = update["description"]
-                    Utils.separator()
-                    Utils.format_text(f"Changelog for {plugin['name']}:", Color.STATUS)
-                    Utils.format_text(changelog, Color.STATUS)
-                    Utils.separator()
+            result = {}
 
-                    if Utils.prompt_bool(f"Would you like to update {plugin['name']}?"):
-                        result = self.api.download_plugin(plugin)
-                    else:
-                        result = {
-                            "status": False,
-                            "message": f"Not updating {plugin['name']}",
-                        }
+            if not self.args.noninteractive:
+                update: Update = self.api.get_latest_update_info(plugin)
+                changelog = update["description"]
+                Utils.separator()
+                Utils.format_text(f"Changelog for {plugin['name']}:", Color.STATUS)
+                Utils.format_text(changelog, Color.STATUS)
+                Utils.separator()
+
+                if not Utils.prompt_bool(f"Would you like to update {plugin['name']}?"):
+                    result = {
+                        "status": False,
+                        "message": f"Not updating {plugin['name']}",
+                    }
+
+            if not result:
+                result = self.api.download_plugin(plugin, filename)
 
             color = Color.WARNING
             if result["status"]:

@@ -1,3 +1,7 @@
+spud.bin
+spud.build/
+spud.dist/
+
 *.jar
 .idea/
 # Byte-compiled / optimized / DLL files
