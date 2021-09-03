@@ -1,6 +1,6 @@
-spud.bin
-spud.build/
-spud.dist/
+*.bin
+*.build/
+*.dist/
 
 *.jar
 .idea/
