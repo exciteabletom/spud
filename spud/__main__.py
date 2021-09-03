@@ -113,8 +113,6 @@ class Main:
                 )
                 continue
 
-            result: StatusDict = {"status": False, "message": ""}
-            cancelled_by_user = False
             # If running in interactive mode
             if not self.args.noninteractive:
                 update: Update = self.api.get_latest_update_info(plugin)
@@ -126,17 +124,18 @@ class Main:
 
                 # If user doesn't want to update
                 if not Utils.prompt_bool(f"Would you like to update {plugin['name']}?"):
-                    cancelled_by_user = True
-                    result = {
-                        "status": False,
-                        "message": f"Not updating {plugin['name']}",
-                    }
+                    Utils.format_text(f"Not updating {plugin['name']}", Color.WARNING)
+                    continue
 
-            # If the user wants to update, or we are running in non-interactive mode
-            if not cancelled_by_user:
-                result = self.api.download_plugin(plugin, filename)
+            # By this point we can ensure that:
+            #  1. The plugin has an update available
+            #  2. The user wants to update
+
+            # Download the latest version of the plugin
+            result: StatusDict = self.api.download_plugin(plugin, filename)
 
             color = Color.WARNING
+            # If the download succeeded
             if result["status"]:
                 update_count += 1
                 color = Color.SUCCESS
