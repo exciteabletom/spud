@@ -108,10 +108,14 @@ class Main:
 
             plugin: Union[Plugin, None] = self.api.get_plugin_info_if_update(metadata)
             if plugin is None:
+                Utils.format_text(
+                    f"Plugin {metadata['search_name']} already up to date", Color.STATUS
+                )
                 continue
 
-            result = {}
-
+            result: StatusDict = {"status": False, "message": ""}
+            cancelled_by_user = False
+            # If running in interactive mode
             if not self.args.noninteractive:
                 update: Update = self.api.get_latest_update_info(plugin)
                 changelog = update["description"]
@@ -120,13 +124,16 @@ class Main:
                 Utils.format_text(changelog, Color.STATUS)
                 Utils.separator()
 
+                # If user doesn't want to update
                 if not Utils.prompt_bool(f"Would you like to update {plugin['name']}?"):
+                    cancelled_by_user = True
                     result = {
                         "status": False,
                         "message": f"Not updating {plugin['name']}",
                     }
 
-            if not result:
+            # If the user wants to update, or we are running in non-interactive mode
+            if not cancelled_by_user:
                 result = self.api.download_plugin(plugin, filename)
 
             color = Color.WARNING
