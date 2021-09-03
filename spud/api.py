@@ -154,7 +154,7 @@ class SpigetAPI:
             return {
                 "status": False,
                 "message": "Could not download resource due to an unknown error. "
-                           "This can sometimes happen with external resources.",
+                "This can sometimes happen with external resources.",
             }
 
         if not filename:
