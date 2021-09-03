@@ -1,6 +1,7 @@
 # Spud
 ![spudman logo](https://raw.githubusercontent.com/exciteabletom/spud/master/logo/spudman_tiny.png)
 
+
 [![GPLv3 License](https://www.gnu.org/graphics/gplv3-88x31.png)](https://www.gnu.org/licenses/gpl-3.0.en.html) [![GitHub Release](https://img.shields.io/github/release/exciteabletom/spud.svg?style=flat)](https://github.com/exciteabletom/spud/releases) [![PyPi Version](https://img.shields.io/pypi/v/spud-mc.svg)](https://pypi.python.org/pypi/spud-mc/)
 
 A cross-platform, [Spigot](https://www.spigotmc.org/) plugin manager that adheres to the
@@ -49,3 +50,7 @@ Spud tries its best to extract the plugin name, but it will fail if there is cop
 
 
 - Spud can't install premium resources
+
+## Acknowledgements
+Logo created by [zach_can_draw](https://instagram.com/zach_can_draw/)
+
