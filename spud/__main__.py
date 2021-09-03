@@ -21,7 +21,7 @@ from .settings import VERSION
 
 
 class Main:
-    """Class for handling program arguments and providing a user interface for the API backend"""
+    """Represents the spud CLI. Handles program arguments and allows the user to interact with the API"""
 
     def __init__(self, api_class=api.SpigetAPI) -> None:
         """Initialise the cli application"""
