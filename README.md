@@ -5,6 +5,8 @@
 [![GPLv3 License](https://www.gnu.org/graphics/gplv3-88x31.png)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 [![GitHub Release](https://img.shields.io/github/release/exciteabletom/spud.svg?style=flat)](https://github.com/exciteabletom/spud/releases) 
 [![PyPI downloads](https://img.shields.io/pypi/dm/spud-mc.svg)](https://pypistats.org/packages/spud-mc)
+[![Code style: Black](https://img.shields.io/badge/code%20style-Black-000000.svg)](https://github.com/psf/black)
+
 
 A cross-platform, [Spigot](https://www.spigotmc.org/) plugin manager that adheres to the
 [Unix philosophy](https://en.wikipedia.org/wiki/Unix_philosophy) and Python best practices.
