@@ -1,6 +1,8 @@
-spud.bin
-spud.build/
-spud.dist/
+*.pyi
+*.bin
+*.build/
+*.dist/
+
 
 *.jar
 .idea/
