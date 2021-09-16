@@ -136,13 +136,13 @@ class Utils:
             if answer == "n":
                 return False
 
-            Utils.format_text("Answer must be 'y' or 'n'", Color.ERROR)
+            cls.format_text("Answer must be 'y' or 'n'", Color.ERROR)
 
-    @staticmethod
-    def separator() -> None:
+    @classmethod
+    def separator(cls) -> None:
         """Print 20 * '-'"""
         sep_char = "-"
-        Utils.format_text(sep_char * 20, Color.DIMMED)
+        cls.format_text(sep_char * 20, Color.DIMMED)
 
     @classmethod
     def inject_metadata_file(cls, plugin: Plugin, filename: str) -> None:
