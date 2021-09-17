@@ -7,6 +7,7 @@ classes:
 """
 from __future__ import annotations
 
+import sys
 from argparse import ArgumentParser, Namespace
 import os
 from pathlib import Path
@@ -148,10 +149,15 @@ class CLI:
         )
 
     @staticmethod
-    def parse_args() -> Namespace:
+    def parse_args(argv=None) -> Namespace:
         """
+        :arg argv: A list of arguments to parse, defaults to sys.argv
         :return: a Namespace instance for the program's arguments
         """
+
+        if argv is None:
+            argv = sys.argv
+
         parser = ArgumentParser(
             description="Spud: The plugin manager for your Spigot Minecraft server",
             epilog="Licensed under GPLv3 (https://www.gnu.org/licenses/gpl-3.0.en.html). "
@@ -183,7 +189,7 @@ class CLI:
         parser.add_argument(
             "-v", "--version", action="version", version=f"%(prog)s {VERSION}"
         )
-        return parser.parse_args()
+        return parser.parse_args(argv)
 
     @staticmethod
     def get_plugin_choice(plugin_list: list[Plugin]) -> Union[Plugin, None]:
