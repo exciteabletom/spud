@@ -201,7 +201,7 @@ class SpigetAPI:
         Get information about the latest update of a plugin
 
         :param plugin: A Plugin dict
-        :returns: An Update dict
+        :return: An Update dict
         """
         response = self.call_api(f"/resources/{plugin['id']}/updates/latest")
         response.raise_for_status()
