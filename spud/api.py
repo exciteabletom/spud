@@ -52,7 +52,7 @@ class SpigetAPI:
         Call an API endpoint
 
         :param endpoint: The endpoint to call
-        :param params: POST request body (optional)
+        :param params: Request body as a dict (optional)
         :returns: A Response object
         """
         if params is None:
