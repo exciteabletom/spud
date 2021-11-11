@@ -154,9 +154,11 @@ class CLI:
         :arg argv: A list of arguments to parse, defaults to sys.argv
         :return: a Namespace instance for the program's arguments
         """
-
         if argv is None:
             argv = sys.argv
+
+        # Remove program name from argv
+        argv = argv[1:]
 
         parser = ArgumentParser(
             description="Spud: The plugin manager for your Spigot Minecraft server",
