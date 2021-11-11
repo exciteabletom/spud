@@ -167,7 +167,7 @@ class SpigetAPI:
 
         Utils.inject_metadata_file(plugin, plugin_jar_name)
 
-        return {"status": True, "message": ""}
+        return {"status": True, "message": f"Downloaded {plugin_jar_name}"}
 
     def get_plugin_info_if_update(self, metadata: Metadata) -> Union[Plugin, None]:
         """
