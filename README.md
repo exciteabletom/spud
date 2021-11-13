@@ -55,6 +55,21 @@ Spud tries its best to extract the plugin name, but it will fail if there is cop
 
 - Spud can't install premium resources
 
+## Setting up a dev environment
+`git clone git@github.com:exciteabletom/spud`
+
+`cd spud`
+
+`python3 -m venv .venv`
+
+Bash: `. .venv/bin/activate`
+
+Windows PowerShell: `.venv\bin\activate.ps1`
+
+`python3 -m pip install -r requirements.txt -r requirements-dev.txt`
+
+`pre-commit install`
+
 ## Acknowledgements
 Logo created by [zach_can_draw](https://instagram.com/zach_can_draw/)
 
