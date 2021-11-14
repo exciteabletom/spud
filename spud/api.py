@@ -214,10 +214,14 @@ class SpigetAPI:
             BeautifulSoup(update["description"], "html.parser").stripped_strings
         )
         # Remove duplicate newlines and spaces
-        update["description"] = update["description"].replace("  ", " ")
-        update["description"] = update["description"].replace("\r\n", "\n")
-        update["description"] = update["description"].replace("\n\n", "\n")
+        update["description"] = (
+            update["description"]
+            .replace("  ", " ")
+            .replace("\r\n", "\n")
+            .replace("\n\n", "\n")
+        )
 
+        # Truncate description to 1500 chars to avoid terminal spam
         if len(update["description"]) > 1500:
             update["description"] = update["description"][:1500] + "..."
         return update
