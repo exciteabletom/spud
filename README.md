@@ -15,7 +15,7 @@ Some focuses of the project are:
 
 1. Easy and simple commands (updating all your plugins is as simple as `spud update`)
 
-1. Unlike other options like [pluGET](https://github.com/Neocky/pluGET), it adheres to Unix conventions and doesn't force you to use a GUI, making it easy to use in scripts.
+1. Unlike other options like [pluGET](https://github.com/Neocky/pluGET), it adheres to Unix conventions and doesn't force you to use a UI, making it easy to use in scripts.
 
 1. Insisting upon readability, static type hinting, test-driven development, and consistent styling in the codebase.
 
