@@ -55,6 +55,9 @@ Spud tries its best to extract the plugin name, but it will fail if there is cop
 
 - Spud can't install premium resources
 
+
+- Unit test coverage could be improved
+
 ## Setting up a dev environment
 `git clone git@github.com:exciteabletom/spud`
 
