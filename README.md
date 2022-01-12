@@ -8,16 +8,16 @@
 [![Code style: Black](https://img.shields.io/badge/code%20style-Black-000000.svg)](https://github.com/psf/black)
 
 
-A cross-platform, [Spigot](https://www.spigotmc.org/) plugin manager that adheres to the
+The cross-platform, [Spigot](https://www.spigotmc.org/) plugin manager that adheres to the
 [Unix philosophy](https://en.wikipedia.org/wiki/Unix_philosophy) and Python best practices.
 
 Some focuses of the project are:
 
 1. Easy and simple commands (updating all your plugins is as simple as `spud update`)
 
-1. Unlike other options like [pluGET](https://github.com/Neocky/pluGET), it adheres to Unix conventions and doesn't force you to use a UI, making it easy to use in scripts.
+1. Adherence to Unix conventions and no forced interactivity, which unlike other options like [pluGET](https://github.com/Neocky/pluGET), makes Spud easy to use in scripts.
 
-1. Insisting upon readability, static type hinting, test-driven development, and consistent styling in the codebase.
+1. Readability, static type hinting, test-driven development, and consistent styling in the codebase.
 
 1. Descriptive output and actionable error messages
 
@@ -54,9 +54,6 @@ Spud tries its best to extract the plugin name, but it will fail if there is cop
 
 
 - Spud can't install premium resources
-
-
-- Unit test coverage could be improved
 
 ## Setting up a dev environment
 `git clone git@github.com:exciteabletom/spud`
