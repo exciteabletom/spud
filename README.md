@@ -19,7 +19,7 @@ Some focuses of the project are:
 
 1. Readability, static type hinting, test-driven development, and consistent styling in the codebase.
 
-1. Descriptive output and actionable error messages
+1. Descriptive and greppable output with actionable error messages
 
 
 ## Installation
