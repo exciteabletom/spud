@@ -1,5 +1,5 @@
 requests
-colorama
+colorama==0.4.6
 PyYAML
-emoji
+emoji==1.7.0
 beautifulsoup4
