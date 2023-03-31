@@ -8,7 +8,7 @@ Variables:
     METADATA_FILENAME - The filename for metadata files saved in jars
 """
 # Static values
-VERSION = "1.3.0"
+VERSION = "1.3.1"
 BASE_API_URL = "https://api.spiget.org/v2"
 USER_AGENT = f"Spud/{VERSION}"
 METADATA_FILENAME = ".spud_meta.json"
